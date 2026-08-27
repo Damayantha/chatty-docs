@@ -20,17 +20,19 @@ Both take your **bot ID** (find it in the dashboard under **Embed & Integrate**)
 
 ## iOS
 
-**Swift Package Manager.** In Xcode: **File → Add Package Dependencies**, paste the URL and select version `1.0.0`:
+**Swift Package Manager.** In Xcode: **File → Add Package Dependencies**, paste the URL and select version `1.0.8`:
 
 ```
-https://github.com/Damayantha/chatty-ios-sdk
+https://github.com/PersonaliAI/chatty-ios-sdk
 ```
 
 Or in `Package.swift`:
 
 ```swift title="Package.swift"
-.package(url: "https://github.com/Damayantha/chatty-ios-sdk", from: "1.0.0")
+.package(url: "https://github.com/PersonaliAI/chatty-ios-sdk", from: "1.0.8")
 ```
+
+Also available via CocoaPods: `pod 'ChattySDK', '~> 1.0.8'`.
 
 ### Floating launcher
 
@@ -77,14 +79,14 @@ dependencyResolutionManagement {
 
 ```kotlin title="app/build.gradle.kts"
 dependencies {
-    implementation("com.github.Damayantha:chatty-android-sdk:v1.0.2")
+    implementation("com.github.PersonaliAI:chatty-android-sdk:v1.0.8")
 }
 ```
 
 <Note>
-Not yet on Maven Central — the Gradle publish config (POM metadata, signing) is already in place,
-it just needs a verified Sonatype account for the `com.personaliai` namespace. Once that happens,
-the dependency becomes `implementation("com.personaliai:chatty-android-sdk:1.0.1")` instead.
+Also published to Maven Central as `com.personaliai:chatty-android-sdk`, but that mirror currently
+lags behind (stuck at `1.0.0`) — use the JitPack coordinate above for the latest release until Central
+catches up.
 </Note>
 
 ### Floating launcher
