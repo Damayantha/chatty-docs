@@ -1,4 +1,4 @@
-export const metadata = { title: "Embed the Widget", description: "Add the Chatty chat widget to any website — WordPress, Shopify, WooCommerce, Prestashop, WHMCS, Adobe Commerce, or plain HTML — in under 2 minutes." }
+export const metadata = { title: "Embed the Widget", description: "Add the Chatty chat widget to any website — WordPress, Shopify, WooCommerce, Prestashop, WHMCS, Adobe Commerce, React, or plain HTML — in under 2 minutes." }
 
 import { Note, Warning, Tip } from "@/components/mdx/Callout"
 import { Card, CardGroup } from "@/components/mdx/Card"
@@ -9,6 +9,8 @@ import { prevNext } from "@/lib/navigation"
 # Embed the Widget
 
 Add your bot to any website with a single `<script>` tag — no framework required.
+
+The widget renders as **native vector HTML/SVG elements** inside an isolated Shadow DOM container, guaranteeing **100% razor-sharp typography and icons at any zoom level** with complete CSS isolation from host styles.
 
 ## Get your embed code
 
@@ -73,12 +75,6 @@ window.Chatty.close()   // close it
 window.Chatty.toggle()  // toggle open/closed
 ```
 
-<Note>
-This is the full API surface today — there's no `window.Chatty.on(...)` event system yet. If you
-need to react to messages or leads programmatically (e.g. push them into your own analytics), use
-[webhooks](/guides/webhooks) instead, which push those events to your backend server-side.
-</Note>
-
 ## Platform guides
 
 <AccordionGroup>
@@ -104,49 +100,100 @@ function chatty_widget() { ?>
 add_action('wp_footer', 'chatty_widget');
 ```
 
-2. Or, if you'd rather not edit theme files, install the **Insert Headers and Footers** plugin
-and paste the same `<script>` snippet into its Footer Scripts field.
-
-</Accordion>
-
-<Accordion title="WooCommerce">
-
-WooCommerce runs on WordPress, so the WordPress steps above work as-is — add the snippet to
-`functions.php` via `wp_footer`, or use the Insert Headers and Footers plugin. The widget will
-appear on all product and checkout pages automatically; no WooCommerce-specific plugin is needed.
+2. Or install the **Insert Headers and Footers** plugin and paste the snippet into the **Footer** section.
 
 </Accordion>
 
 <Accordion title="Shopify">
 
-1. In your Shopify admin, go to **Online Store → Themes → Edit code**.
-2. Open `layout/theme.liquid` and paste the snippet just before `</body>`:
+1. In your Shopify admin, go to **Online Store → Themes**.
+2. Click the `...` button next to your active theme and choose **Edit code**.
+3. Open `layout/theme.liquid`.
+4. Scroll down to the bottom and paste the snippet just before the closing `</body>` tag:
 
 ```html
 <script src="https://chatty.personaliai.com/widget.js" data-id="YOUR_BOT_ID" defer></script>
 ```
 
-3. Click **Save** — the widget appears on all storefront pages.
+5. Click **Save**.
+
+</Accordion>
+
+<Accordion title="React / Next.js (Component or Script)">
+
+For React and Next.js applications, you can install the official NPM package:
+
+```bash
+npm install @personaliai/react-widget
+```
+
+```tsx
+import { ChattyWidget } from "@personaliai/react-widget";
+import "@personaliai/react-widget/styles.css";
+
+export default function ChatPage() {
+  return (
+    <div className="h-[600px] w-[380px]">
+      <ChattyWidget botId="YOUR_BOT_ID" />
+    </div>
+  );
+}
+```
+
+Or add the `<Script>` component:
+
+```tsx
+import Script from "next/script";
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        {children}
+        <Script
+          src="https://chatty.personaliai.com/widget.js"
+          data-id="YOUR_BOT_ID"
+          strategy="afterInteractive"
+        />
+      </body>
+    </html>
+  );
+}
+```
+
+</Accordion>
+
+<Accordion title="WooCommerce">
+
+WooCommerce runs on WordPress — follow the WordPress steps above:
+
+```php
+function chatty_widget() { ?>
+<script src="https://chatty.personaliai.com/widget.js" data-id="YOUR_BOT_ID" defer></script>
+<?php }
+add_action('wp_footer', 'chatty_widget');
+```
+
+The widget will appear across all shop, product, cart, and checkout pages.
 
 </Accordion>
 
 <Accordion title="Prestashop">
 
-1. Go to **Modules → Module Manager** and search for a Custom HTML module.
-2. If one isn't available, edit your active theme's `footer.tpl` directly and paste the snippet
-just before `</body>`.
-3. Clear the Prestashop cache under **Advanced Parameters → Performance**.
-
-<Tip>Editing `footer.tpl` directly requires FTP or file-manager access to your Prestashop install.</Tip>
+1. In your Prestashop admin, go to **Modules → Module Manager** and look for a Custom HTML / Block
+module to add script snippets to the footer.
+2. If editing templates directly via FTP: open `/themes/<your-theme>/templates/_partials/footer.tpl`
+(or `footer.tpl` on Prestashop 1.6) and paste the snippet just before `</body>`.
+3. Clear the cache under **Advanced Parameters → Performance**.
 
 </Accordion>
 
 <Accordion title="WHMCS">
 
-1. Open your WHMCS template folder: `/templates/<your-theme>/footer.tpl`.
-2. Paste the snippet just before `</body>`.
-3. Save, then clear the WHMCS template cache. Make sure to replace `<your-theme>` with your
-active template's actual name.
+1. Connect to your server via FTP or open your cPanel File Manager.
+2. Navigate to `/templates/<your-active-template>/footer.tpl`.
+3. Paste the snippet just before the closing `</body>` tag.
+4. Save the file and clear the template cache in the WHMCS admin under **Utilities → System → System Cleanup → Empty Template Cache**.
 
 </Accordion>
 
@@ -176,22 +223,20 @@ not listed above.
 
 </Accordion>
 
-<Accordion title="Standalone iframe (no floating launcher)">
+<Accordion title="Inline Full-Page Embed">
 
-If you want a full embedded chat window inline in your page instead of a floating launcher
-button, embed the chat directly as an iframe:
+If you want a dedicated in-page chat window inline in your page instead of a floating launcher
+button, embed the chat directly:
 
 ```html
 <iframe
   src="https://chatty.personaliai.com/embed/YOUR_BOT_ID"
-  width="400"
-  height="600"
+  width="100%"
+  height="650"
   style="border:none;border-radius:16px;"
+  allow="clipboard-write; microphone; notifications"
 ></iframe>
 ```
-
-Adjust `width`/`height` to fit your layout. This mode has no floating launcher — the chat is
-always visible wherever you place the iframe.
 
 </Accordion>
 
