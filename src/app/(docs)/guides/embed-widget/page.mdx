@@ -119,28 +119,9 @@ add_action('wp_footer', 'chatty_widget');
 
 </Accordion>
 
-<Accordion title="React / Next.js (Component or Script)">
+<Accordion title="React / Next.js">
 
-For React and Next.js applications, you can install the official NPM package:
-
-```bash
-npm install @personaliai/react-widget
-```
-
-```tsx
-import { ChattyWidget } from "@personaliai/react-widget";
-import "@personaliai/react-widget/styles.css";
-
-export default function ChatPage() {
-  return (
-    <div className="h-[600px] w-[380px]">
-      <ChattyWidget botId="YOUR_BOT_ID" />
-    </div>
-  );
-}
-```
-
-Or add the `<Script>` component:
+Add the script tag to your root layout using Next.js's built-in Script component:
 
 ```tsx
 import Script from "next/script";
@@ -160,6 +141,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+
+For plain React (Vite / CRA), add the standard script tag to your `index.html` before `</body>`.
+
+Renders as native vector DOM elements inside an isolated Shadow Root — zero iframes, 100% sharp at any zoom level.
 
 </Accordion>
 
