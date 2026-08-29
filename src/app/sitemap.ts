@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE = "https://docs.personaliai.com";
+const BASE = "https://docs.chatty.personaliai.com";
 
 const pages = [
   { url: "/introduction",                        priority: 1.0 },
