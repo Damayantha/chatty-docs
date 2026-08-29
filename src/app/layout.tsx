@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -17,10 +18,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
-        <script
+        <Script
           src="https://chatty.personaliai.com/widget.js"
-          data-id="e4be8304-2eb6-48aa-add8-6cab78ee7218"
-          defer
+          data-id="25d0f784-5f04-4777-9a4d-8c9c1481306f"
+          strategy="afterInteractive"
         />
       </body>
     </html>
