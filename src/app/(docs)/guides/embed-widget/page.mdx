@@ -65,6 +65,22 @@ re-embed).
 ></script>
 ```
 
+## Voice messages
+
+Visitors can tap the mic icon in the composer to record a voice message. What happens next is
+controlled per-bot from the dashboard's **Customizer → Voice Messages** setting:
+
+- **Transcribe & send as text** (default) — the recording is transcribed and the text is placed in
+  the input box for the visitor to review and edit before sending.
+- **Send as audio message** — the recording itself is sent, and renders as a playable voice-message
+  bubble (play/pause, waveform, duration) styled to match the bot's design.
+
+<Note>
+Recording requires microphone access. If you're using the [inline iframe embed](#platform-guides)
+instead of the script tag, make sure its `allow` attribute includes `microphone` (see the example
+below) — the script-tag embed doesn't need this since it isn't an iframe.
+</Note>
+
 ## JavaScript API
 
 Once the widget has loaded, control it programmatically via `window.Chatty`:
