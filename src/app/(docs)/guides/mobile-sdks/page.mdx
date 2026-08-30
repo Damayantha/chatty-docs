@@ -1,6 +1,6 @@
 export const metadata = { title: "Mobile SDKs", description: "Add Chatty to iOS, Android, and React Native apps with native SDKs." }
 
-import { Note, Warning } from "@/components/mdx/Callout"
+import { Note, Warning, Tip } from "@/components/mdx/Callout"
 import { Card, CardGroup } from "@/components/mdx/Card"
 import { PageNav } from "@/components/PageNav"
 import { prevNext } from "@/lib/navigation"
@@ -16,11 +16,18 @@ Every SDK exposes the same two entry points:
 
 Both take your **bot ID** (find it in the dashboard under **Embed & Integrate**). Optional parameters: `baseUrl`/`baseURL`, `host`, `position`, and `color`.
 
+<Note>
+**v1.1.0+** adds native voice calling on all three platforms (`ChattyVoiceCallView` /
+`ChattyVoiceCallScreen`) — a live, full-duplex conversation with the bot, matching the web widget's
+voice call feature. It's opt-in per platform (see each section's "Voice calls" below) so apps that
+don't use it don't pay for LiveKit's dependency footprint.
+</Note>
+
 ---
 
 ## iOS
 
-**Swift Package Manager.** In Xcode: **File → Add Package Dependencies**, paste the URL and select version `1.0.8`:
+**Swift Package Manager.** In Xcode: **File → Add Package Dependencies**, paste the URL and select version `1.1.0`:
 
 ```
 https://github.com/PersonaliAI/chatty-ios-sdk
@@ -29,10 +36,10 @@ https://github.com/PersonaliAI/chatty-ios-sdk
 Or in `Package.swift`:
 
 ```swift title="Package.swift"
-.package(url: "https://github.com/PersonaliAI/chatty-ios-sdk", from: "1.0.8")
+.package(url: "https://github.com/PersonaliAI/chatty-ios-sdk", from: "1.1.0")
 ```
 
-Also available via CocoaPods: `pod 'ChattySDK', '~> 1.0.8'`.
+Also available via CocoaPods: `pod 'ChattySDK', '~> 1.1.0'`.
 
 ### Floating launcher
 
@@ -63,6 +70,34 @@ struct SupportView: View {
 
 <Note>Requires iOS 15+. No special `Info.plist` permissions are needed for basic chat; add `NSPhotoLibraryUsageDescription` only if visitors will upload images.</Note>
 
+### Voice calls
+
+Ships as a separate product, `ChattySDKVoice` — add it as an extra Package Dependency in Xcode
+(or your `Package.swift`) alongside `ChattySDK`; it pulls in LiveKit's Swift SDK for you, and apps
+that only need `ChattySDK` are unaffected:
+
+```swift
+.library(name: "ChattySDKVoice", ...) // add alongside ChattySDK in Package Dependencies
+```
+
+```swift title="SupportView.swift"
+import ChattySDKVoice
+
+@State private var showCall = false
+
+var body: some View {
+    if showCall {
+        ChattyVoiceCallView(client: client, sessionId: sessionId,
+            widgetStyle: theme?.widget_style, onClose: { showCall = false })
+    } else {
+        ChattyChatView(botId: "YOUR_BOT_ID", onVoiceCallPress: { showCall = true })
+    }
+}
+```
+
+Also add `NSMicrophoneUsageDescription` to your app's Info.plist — the call fails silently on
+launch without it, since iOS kills the mic-access request rather than showing an error.
+
 ---
 
 ## Android
@@ -79,7 +114,7 @@ dependencyResolutionManagement {
 
 ```kotlin title="app/build.gradle.kts"
 dependencies {
-    implementation("com.github.PersonaliAI:chatty-android-sdk:v1.0.8")
+    implementation("com.github.PersonaliAI:chatty-android-sdk:v1.1.0")
 }
 ```
 
@@ -115,6 +150,38 @@ import com.personaliai.chatty.ChattyChatScreen
 
 ChattyChatScreen(botId = "YOUR_BOT_ID", modifier = Modifier.fillMaxSize())
 ```
+
+### Voice calls
+
+Opt-in — only an app that renders the call screen needs LiveKit's (large, WebRTC-based) Android
+SDK pulled in:
+
+```kotlin title="build.gradle.kts (your app module)"
+dependencies {
+    implementation("io.livekit:livekit-android:2.18.2") // or newer
+}
+```
+
+```kotlin title="Application.onCreate(), once"
+LiveKit.init(applicationContext)
+```
+
+```kotlin title="SupportScreen.kt"
+var showCall by remember { mutableStateOf(false) }
+if (showCall) {
+    ChattyVoiceCallScreen(
+        client = client,
+        sessionId = sessionId, // the same session id ChattyChatScreen is using
+        widgetStyle = state.theme?.widgetStyle,
+        onClose = { showCall = false },
+    )
+} else {
+    ChattyChatScreen(state = state, onVoiceCallPress = { showCall = true })
+}
+```
+
+Also add `<uses-permission android:name="android.permission.RECORD_AUDIO" />` to your
+`AndroidManifest.xml` and request it at runtime before showing the call screen.
 
 ### ProGuard / R8
 
@@ -161,6 +228,46 @@ export function SupportScreen() {
 
 <Note>Requires React Native 0.72+. Renders real native components on both iOS and Android — no WebView.</Note>
 
+### Voice calls
+
+The one feature that needs native linking — install its peer dependencies too, and call
+`registerGlobals()` once at app startup before creating any call:
+
+```bash
+npm install livekit-client @livekit/react-native @livekit/react-native-webrtc
+```
+
+```tsx title="index.js"
+import { registerGlobals } from "@livekit/react-native";
+registerGlobals();
+```
+
+```tsx title="MyChat.tsx"
+import { ChattyChatView, ChattyVoiceCallView, ChattyClient } from "@personaliai/react-native";
+
+function MyChat() {
+  const [showCall, setShowCall] = useState(false);
+  const client = useMemo(() => new ChattyClient({ botId: "YOUR_BOT_ID" }), []);
+
+  if (showCall) {
+    return (
+      <ChattyVoiceCallView
+        client={client}
+        sessionId={sessionId} // the same session id ChattyChatView is using
+        widgetStyle={theme?.widget_style}
+        onClose={() => setShowCall(false)}
+      />
+    );
+  }
+  return <ChattyChatView botId="YOUR_BOT_ID" onVoiceCallPress={() => setShowCall(true)} />;
+}
+```
+
+<Tip>
+Add `NSMicrophoneUsageDescription` (iOS) and `RECORD_AUDIO` (Android) permissions — see LiveKit's
+own React Native setup docs for the platform-specific steps.
+</Tip>
+
 ---
 
 ## Common options
@@ -182,6 +289,7 @@ The chat session is created and persisted automatically per device — you don't
 <CardGroup cols={2}>
   <Card title="Embed Widget" href="/guides/embed-widget">Add Chatty to a website with one script tag.</Card>
   <Card title="Webhooks" href="/guides/webhooks">Receive lead and message events server-side.</Card>
+  <Card title="Create a Chat Widget" href="/guides/create-widget">Full setup walkthrough from scratch.</Card>
 </CardGroup>
 
 <PageNav {...prevNext("/guides/mobile-sdks")} />

@@ -10,6 +10,44 @@ Release notes for the Chatty platform and API.
 
 ---
 
+## August 2026
+
+### 2026-08-31 — Per-member dashboard permissions
+
+- Team roles (`admin`/`agent`) now actually control access: each invited member's dashboard tabs
+  (Inbox, Knowledge, Customizer, Settings, Voice Agent, Team, Billing, BYOK, Webhooks) are
+  individually grantable, editable any time by the owner or an admin with the Team permission.
+- **Admin** defaults to everything except Billing, BYOK keys, and Webhooks — those stay owner-only
+  unless explicitly granted.
+- **Agent** defaults to Inbox only.
+- Deleting a conversation now requires owner/admin — an agent can reply but not erase history.
+
+---
+
+### 2026-08-30 — Native voice calls in the mobile SDKs (v1.1.0)
+
+- `ChattyVoiceCallView` (iOS, React Native) and `ChattyVoiceCallScreen` (Android) — a live,
+  full-duplex voice call with the bot, matching the web widget's voice call experience: real-time
+  transcript, mic level meter, mute/hang-up controls, themed per the bot's active design.
+- Opt-in per platform via a separate dependency (`ChattySDKVoice` product on iOS,
+  `io.livekit:livekit-android` on Android, `livekit-client`/`@livekit/react-native` peer deps on
+  React Native) — apps that don't use voice don't pay for LiveKit's footprint.
+- See [Mobile SDKs → Voice calls](/guides/mobile-sdks#voice-calls) for setup per platform.
+
+---
+
+### 2026-08-17 — Live voice calls on the web widget
+
+- Enable **Voice Agent** for a bot and a phone icon appears in the widget header — tapping it
+  starts a live, full-duplex spoken conversation with the bot right inside the widget (real-time
+  transcript, mic level meter, mute/hang-up), no extra embed code required.
+- Same feature now ships identically on WordPress (via the shared `widget.js`) and all three mobile
+  SDKs — see the entry above.
+- Distinct from voice **messages** (a visitor recording and sending one audio clip in text chat) —
+  both can be enabled together.
+
+---
+
 ## July 2026
 
 ### 2026-07-07 — API v1 security & new endpoints

@@ -10,6 +10,11 @@ import { prevNext } from "@/lib/navigation"
 
 Add your bot to any website with a single `<script>` tag — no framework required.
 
+<Note>
+Haven't created and trained a bot yet? Start with [Create a Chat Widget](/guides/create-widget) for
+the full walkthrough — this page assumes you already have a Bot ID.
+</Note>
+
 The widget renders as **native vector HTML/SVG elements** inside an isolated Shadow DOM container, guaranteeing **100% razor-sharp typography and icons at any zoom level** with complete CSS isolation from host styles.
 
 ## Get your embed code
@@ -79,6 +84,20 @@ controlled per-bot from the dashboard's **Customizer → Voice Messages** settin
 Recording requires microphone access. If you're using the [inline iframe embed](#platform-guides)
 instead of the script tag, make sure its `allow` attribute includes `microphone` (see the example
 below) — the script-tag embed doesn't need this since it isn't an iframe.
+</Note>
+
+## Voice calls
+
+If **Voice Agent** is enabled for the bot (dashboard sidebar → **Voice Agent**), a phone icon
+appears in the widget header. Tapping it opens a live, full-duplex spoken conversation with the
+bot right inside the widget — a real-time transcript, mic level meter, and mute/hang-up controls —
+with no extra embed code or configuration needed. It works the same way in every embed method on
+this page (script tag, iframe, WordPress, mobile SDKs).
+
+<Note>
+This is a live voice **call** (LiveKit-powered), distinct from the [voice messages](#voice-messages)
+setting above (a visitor recording and sending a single audio clip). Both can be enabled at once —
+voice messages happen inline in text chat, voice calls replace the chat view for the call's duration.
 </Note>
 
 ## JavaScript API
@@ -248,6 +267,7 @@ button, embed the chat directly:
 <CardGroup cols={2}>
   <Card title="Mobile SDKs" href="/guides/mobile-sdks">Native iOS and Android integration.</Card>
   <Card title="Webhooks" href="/guides/webhooks">Push events to your backend in real time.</Card>
+  <Card title="Create a Chat Widget" href="/guides/create-widget">Full setup walkthrough from scratch.</Card>
 </CardGroup>
 
 <PageNav {...prevNext("/guides/embed-widget")} />

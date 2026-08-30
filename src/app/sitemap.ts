@@ -19,6 +19,7 @@ const pages = [
   { url: "/api-reference/knowledge/delete",      priority: 0.7 },
   { url: "/api-reference/analytics/summary",     priority: 0.8 },
   { url: "/api-reference/usage/stats",           priority: 0.7 },
+  { url: "/guides/create-widget",                priority: 0.9 },
   { url: "/guides/embed-widget",                 priority: 0.9 },
   { url: "/guides/mobile-sdks",                  priority: 0.8 },
   { url: "/guides/webhooks",                     priority: 0.8 },

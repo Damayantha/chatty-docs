@@ -1,0 +1,170 @@
+export const metadata = { title: "Create a Chat Widget", description: "The complete walkthrough — from signing up to a live chat widget on your site: create a bot, train it, customize it, and embed it." }
+
+import { Note, Warning, Tip } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { Accordion, AccordionGroup } from "@/components/mdx/Accordion"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Create a Chat Widget
+
+This is the full path from a blank account to a live, trained, on-brand chat widget on your
+website — no code required until the very last step. If you just want the embed snippet, skip
+ahead to [Embed the Widget](/guides/embed-widget).
+
+## 1. Create your bot
+
+Log in to the [Chatty dashboard](https://chatty.personaliai.com/dashboard). If this is your first
+bot, the setup wizard walks you through the steps below automatically — you can also do them
+manually any time from the sidebar.
+
+Click **Create New Assistant** in the bot switcher (top of the sidebar) and give it a name. Each
+bot is fully independent: its own training data, design, team, and embed code.
+
+## 2. Train it in the Knowledge Base
+
+Open **Knowledge Base** in the sidebar. Everything you add here is chunked and embedded into the
+bot's RAG memory, so it can answer questions grounded in your actual content instead of guessing.
+
+<AccordionGroup>
+
+<Accordion title="Text / FAQ">
+
+Paste an FAQ, policy, or product description directly. Good for content you want word-for-word
+accurate (refund policy, pricing tiers, shipping rules).
+
+</Accordion>
+
+<Accordion title="Website URL">
+
+Enter a page or your sitemap.xml — Chatty crawls it and lets you pick which discovered pages to
+index. Turn on a re-crawl schedule (hourly/daily/weekly) under the source's settings so the bot
+stays current as your site changes.
+
+</Accordion>
+
+<Accordion title="Upload File">
+
+PDF, DOCX, TXT, and MD are supported. Drag and drop or browse — each file becomes its own source
+you can retrain or remove independently.
+
+</Accordion>
+
+<Accordion title="Google Drive / OneDrive">
+
+Click **Google** or **Microsoft** in the **Quick Connect** row, authorize access, then pick a Drive
+or OneDrive folder to sync. Files in that folder (PDF, DOCX, Sheets, Docs, TXT, MD) index
+automatically, and re-index when they change — this one connection also unlocks Google/Outlook
+Calendar for [meeting scheduling](#7-optional-turn-on-scheduling--voice), so you only authorize
+once for both.
+
+</Accordion>
+
+</AccordionGroup>
+
+Check **Total Sources**, **Characters Indexed**, and **Status** at the top of the page to confirm
+everything finished training before moving on.
+
+<Tip>
+Open the **Playground** tab any time to chat with your bot exactly as a visitor would, using
+whatever's trained so far — a fast way to spot gaps before you go live.
+</Tip>
+
+## 3. Write its instructions
+
+Under **Settings → AI Engine Settings**, set the **System Instructions** — the bot's persona, tone,
+and boundaries (what to help with, what to escalate to a human, what never to say). This sits
+alongside your trained sources: sources are *what it knows*, instructions are *how it behaves*.
+
+Also on this tab: pick the underlying model, toggle **Strict Mode** (answer only from trained
+sources vs. a hybrid/web fallback), and set the **Welcome Message** visitors see first.
+
+## 4. Customize the look
+
+Open **Customizer**. Pick one of the 10 built-in design presets (Minimal, Playful, Corporate, Dark
+Sleek, Gradient Glow, Glassmorphism, E-commerce, Healthcare Calm, Neubrutalism, Luxury Editorial) as
+a starting point, then fine-tune:
+
+- **Primary color** — the launcher, header, and user-message bubble color.
+- **Font** — loaded from Google Fonts, or leave on "Design default" to keep the preset's own pairing.
+- **Text size** — scales every widget text size together, 80%–150%.
+- **Launcher shape & position** — which corner it docks to, and its shape.
+- **Voice Messages** — whether a visitor's recorded voice message gets transcribed to text for them
+  to review (default) or sent as a playable audio bubble.
+
+The live preview on the right updates as you edit, including a **call view** toggle if Voice Agent
+is enabled — see the next step.
+
+## 5. Turn on lead capture (optional)
+
+Under **Knowledge Base → Lead Capture**, enable it and pick which fields to collect (name, email,
+company, etc.) — mark any as required. The bot asks for these conversationally when it makes sense,
+not as an upfront form; new fields you add here automatically become columns in the **Leads** tab.
+
+## 6. Turn on Voice Agent (optional)
+
+Open **Voice Agent** in the sidebar to let visitors have a live spoken conversation with your bot
+instead of typing — a phone icon appears in the widget header once this is on. Configure:
+
+- **Agent role/persona** and **max call duration**.
+- **STT/TTS providers** (or bring your own key under BYOK).
+- **Mode**: pipelined (separate speech-to-text → LLM → text-to-speech) or realtime (a single
+  low-latency realtime model).
+
+<Note>
+This is a full duplex voice **call**, distinct from the Customizer's voice-**message** setting above
+(a visitor recording and sending one clip). Both can be on at once.
+</Note>
+
+## 7. Optional: turn on scheduling
+
+If you connected Google or Microsoft in step 2, open **Meetings** to let the bot book real calendar
+events — pick a meeting provider (Google Meet, Teams, Zoom), set business hours, buffer time, and
+advance notice, and the bot offers open slots conversationally when a visitor wants to talk to a
+human.
+
+## 8. Invite your team
+
+Under **Settings → Team**, invite teammates by email. For each person, pick a role and exactly
+which dashboard tabs they can reach:
+
+- **Agent** — defaults to **Inbox** only: reply to conversations, see leads, nothing else. Good for
+  someone who just handles support.
+- **Admin** — defaults to everything except **Billing**, **BYOK keys**, and **Webhooks**, which stay
+  owner-only unless you explicitly grant them.
+
+You (the owner) can adjust any member's tabs at any time from the same screen — click **Manage** on
+their row. Access is scoped to this bot only.
+
+<Warning>
+Invited members need their own account with the exact email you invited — there's no separate
+password to share. If they don't have one yet, they sign up at chatty.personaliai.com and the bot
+appears in their dashboard automatically.
+</Warning>
+
+## 9. Test it
+
+Use **Playground** for a private test chat, or open **Voice Agent → Test call** if you enabled
+voice. Confirm the bot cites your actual trained content, respects Strict Mode, and hands off to
+**Inbox** correctly when a visitor asks for a human.
+
+## 10. Get your embed code and go live
+
+Open **Embed & Integrate**, copy your **Bot ID**, and follow the [Embed the Widget](/guides/embed-widget)
+guide for your platform (WordPress, Shopify, React, plain HTML, and more) — most platforms take
+under two minutes with a single script tag. Building a native mobile app instead? See
+[Mobile SDKs](/guides/mobile-sdks).
+
+Any change you make in the dashboard afterward (design, training, voice, scheduling) takes effect
+immediately on the live widget — you never need to re-embed.
+
+## What's next
+
+<CardGroup cols={2}>
+  <Card title="Embed the Widget" href="/guides/embed-widget">Platform-specific embed snippets.</Card>
+  <Card title="Mobile SDKs" href="/guides/mobile-sdks">Native iOS, Android, and React Native integration.</Card>
+  <Card title="Webhooks" href="/guides/webhooks">Push lead and message events to your backend.</Card>
+  <Card title="BYOK" href="/guides/byok">Use your own OpenAI/Anthropic/Gemini API key.</Card>
+</CardGroup>
+
+<PageNav {...prevNext("/guides/create-widget")} />

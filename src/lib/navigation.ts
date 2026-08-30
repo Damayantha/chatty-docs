@@ -37,6 +37,7 @@ export const navigation: NavGroup[] = [
   {
     title: "Guides",
     items: [
+      { title: "Create a Chat Widget", href: "/guides/create-widget" },
       { title: "Embed Widget",   href: "/guides/embed-widget" },
       { title: "Mobile SDKs",   href: "/guides/mobile-sdks" },
       { title: "Webhooks",      href: "/guides/webhooks" },
