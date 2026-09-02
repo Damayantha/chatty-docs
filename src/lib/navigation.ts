@@ -32,6 +32,7 @@ export const navigation: NavGroup[] = [
       { title: "Delete Knowledge",     href: "/api-reference/knowledge/delete" },
       { title: "Analytics Summary",    href: "/api-reference/analytics/summary" },
       { title: "API Key Usage",        href: "/api-reference/usage/stats" },
+      { title: "Manage Bots",          href: "/api-reference/bots/manage" },
     ],
   },
   {
@@ -44,6 +45,7 @@ export const navigation: NavGroup[] = [
       { title: "BYOK",          href: "/guides/byok" },
       { title: "Languages",     href: "/guides/languages" },
       { title: "Google Auth Setup", href: "/guides/google-auth-setup" },
+      { title: "MCP Server",    href: "/guides/mcp" },
     ],
   },
   {

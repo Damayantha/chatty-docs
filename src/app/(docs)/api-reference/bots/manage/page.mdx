@@ -1,0 +1,100 @@
+export const metadata = { title: "Manage Bots", description: "Create, list, update, and analyze bots — requires OAuth2, not an API key." }
+
+import { Note, Warning } from "@/components/mdx/Callout"
+import { ApiEndpointBadge } from "@/components/mdx/ApiEndpointBadge"
+import { ParamField, ResponseField } from "@/components/mdx/ParamField"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Manage Bots
+
+<Warning>
+  Every endpoint on this page requires an [OAuth2 access token](/authentication#oauth2-multi-account-access) (`chatty_oat_...`), not an API key. An API key is scoped to one bot and has no concept of "your account" — creating or listing bots needs a principal that spans your whole account. `GET`/`PATCH .../{bot_id}` and the analytics/knowledge endpoints also accept an API key, but only for the one bot that key was minted for.
+</Warning>
+
+## Create a bot
+
+<ApiEndpointBadge method="POST" path="/api/v1/bots" />
+
+**Required scope:** `write` (OAuth2 only)
+
+<ParamField body="name" type="string" required>Display name for the new bot.</ParamField>
+<ParamField body="welcome_message" type="string">First message visitors see. Defaults to a generic greeting.</ParamField>
+<ParamField body="system_instructions" type="string">The bot's system prompt — persona, rules, knowledge boundaries.</ParamField>
+<ParamField body="selected_model" type="string">LLM model id. Omit for the account default.</ParamField>
+<ParamField body="primary_color" type="string">Hex color for the widget accent, e.g. `"#f97316"`.</ParamField>
+<ParamField body="response_language" type="string">Language code the bot should reply in, e.g. `"en"`.</ParamField>
+
+```bash title="cURL"
+curl -X POST https://api.chatty.personaliai.com/api/v1/bots \
+  -H "Authorization: Bearer chatty_oat_your_token" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Support Bot", "welcome_message": "Hi! How can I help?"}'
+```
+
+## List your bots
+
+<ApiEndpointBadge method="GET" path="/api/v1/bots" />
+
+**Required scope:** `read` (OAuth2 only)
+
+Returns every bot your account owns: `id`, `name`, `welcome_message`, `primary_color`, `selected_model`, `created_at`.
+
+## Get a bot
+
+<ApiEndpointBadge method="GET" path="/api/v1/bots/{bot_id}" />
+
+**Required scope:** `read`
+
+<ResponseField name="id" type="string">Bot id.</ResponseField>
+<ResponseField name="name" type="string">Display name.</ResponseField>
+<ResponseField name="welcome_message" type="string">First message.</ResponseField>
+<ResponseField name="primary_color" type="string">Hex accent color.</ResponseField>
+<ResponseField name="selected_model" type="string">LLM model id.</ResponseField>
+<ResponseField name="system_instructions" type="string">System prompt.</ResponseField>
+<ResponseField name="widget_style" type="string">Design preset id.</ResponseField>
+<ResponseField name="response_language" type="string">Forced reply language, or empty for auto-mirror.</ResponseField>
+<ResponseField name="strict_mode" type="boolean">Whether the bot only answers from its knowledge base.</ResponseField>
+<ResponseField name="lead_capture_enabled" type="boolean">Whether the bot captures visitor contact details.</ResponseField>
+<ResponseField name="created_at" type="string">ISO 8601 creation timestamp.</ResponseField>
+<ResponseField name="updated_at" type="string">ISO 8601 last-update timestamp.</ResponseField>
+
+## Update a bot
+
+<ApiEndpointBadge method="PATCH" path="/api/v1/bots/{bot_id}" />
+
+**Required scope:** `write`
+
+Same body fields as **Create a bot**, plus `widget_style`, `strict_mode`, and `lead_capture_enabled`. Only the fields you send are changed.
+
+```bash title="cURL"
+curl -X PATCH https://api.chatty.personaliai.com/api/v1/bots/BOT_ID \
+  -H "Authorization: Bearer chatty_oat_your_token" \
+  -H "Content-Type: application/json" \
+  -d '{"primary_color": "#6366f1"}'
+```
+
+## Add a knowledge source
+
+<ApiEndpointBadge method="POST" path="/api/v1/bots/{bot_id}/knowledge" />
+
+**Required scope:** `write`
+
+<ParamField body="name" type="string" required>Display name for the source.</ParamField>
+<ParamField body="content" type="string" required>Text content (max 100,000 characters). For URL crawling, use the per-key [Add Knowledge Source](/api-reference/knowledge/add) endpoint instead.</ParamField>
+
+## Analyze a bot
+
+<ApiEndpointBadge method="GET" path="/api/v1/bots/{bot_id}/analytics" />
+
+**Required scope:** `read`
+
+<ResponseField name="total_messages" type="integer">Total conversation messages, all time.</ResponseField>
+<ResponseField name="user_messages" type="integer">Messages sent by visitors.</ResponseField>
+<ResponseField name="bot_messages" type="integer">Messages sent by the assistant.</ResponseField>
+<ResponseField name="unique_sessions" type="integer">Distinct visitor sessions.</ResponseField>
+<ResponseField name="total_leads" type="integer">Leads captured, all time.</ResponseField>
+
+<Note>For a single bot you already have an API key for, [`GET /api/v1/analytics`](/api-reference/analytics/summary) supports a `since` filter this endpoint doesn't yet have.</Note>
+
+<PageNav {...prevNext("/api-reference/bots/manage")} />

@@ -62,6 +62,32 @@ Restrict a key to specific IPs or CIDR ranges. Requests from any other IP return
 
 These require a **Supabase session token** (dashboard login), not an API key.
 
+## OAuth2 (multi-account access)
+
+An API key is scoped to exactly **one bot** — it can't create new bots or list every bot on your account. For that, authenticate as your Chatty *account* instead, via OAuth2. This is what powers the [Developer API's bot-management endpoints](/api-reference/bots/manage) and the [MCP server](/guides/mcp), and is the right choice for building an integration or connecting an AI agent rather than embedding a single widget.
+
+<Tip>If you're connecting an MCP client (Claude Desktop, etc.), you don't need to read this section — MCP clients discover and register themselves automatically. This is for building your own OAuth2 integration.</Tip>
+
+Chatty implements the standard authorization-code grant with mandatory PKCE (S256) — the same flow GitHub, Google, and most modern APIs use:
+
+1. **Register your app** — `POST https://api.chatty.personaliai.com/oauth/register` with `{"client_name": "...", "redirect_uris": ["https://yourapp.com/callback"]}`. Returns a `client_id` (and a `client_secret` if you asked for a confidential client via `"token_endpoint_auth_method": "client_secret_post"` — omit it for a public/PKCE-only client, e.g. a CLI tool or desktop app).
+2. **Send the user to approve access** — redirect their browser to `/oauth/authorize` with `client_id`, `redirect_uri`, `scope`, a PKCE `code_challenge` (S256), and a `state` value you'll verify on return.
+3. **Exchange the code** — after approval, your `redirect_uri` receives `?code=...&state=...`. `POST /oauth/token` (form-encoded, not JSON) with `grant_type=authorization_code`, the `code`, your `code_verifier`, and `redirect_uri` to get an access token (1 hour) and refresh token (30 days).
+4. **Use the token** — same as an API key: `Authorization: Bearer chatty_oat_...` on any `/api/v1/*` request.
+
+```bash title="Token exchange"
+curl -X POST https://api.chatty.personaliai.com/oauth/token \
+  -d grant_type=authorization_code \
+  -d code=THE_CODE_FROM_STEP_3 \
+  -d redirect_uri=https://yourapp.com/callback \
+  -d client_id=YOUR_CLIENT_ID \
+  -d code_verifier=YOUR_PKCE_VERIFIER
+```
+
+<Warning>The token endpoint requires `application/x-www-form-urlencoded` (RFC 6749), not JSON — this is what makes off-the-shelf OAuth2 client libraries work against it without modification.</Warning>
+
+Discovery metadata (for OAuth2/MCP client libraries that auto-configure themselves) is served at `/.well-known/oauth-authorization-server`.
+
 ## Security headers
 
 Every response includes:

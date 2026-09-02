@@ -1,0 +1,53 @@
+export const metadata = { title: "MCP Server", description: "Connect an MCP client (like Claude Desktop) to create and manage your Chatty bots." }
+
+import { Note, Tip, Warning } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# MCP Server
+
+Chatty runs an [MCP](https://modelcontextprotocol.io) server, so an MCP-compatible AI agent — Claude Desktop, Claude Code, or any other MCP client — can create, customize, and analyze your bots directly, in conversation, instead of you clicking through the dashboard.
+
+<Tip>This is the fastest way to try the Developer API: no code to write, just point an MCP client at the server below and approve the connection.</Tip>
+
+## What it can do
+
+<CardGroup cols={2}>
+  <Card title="list_chatbots" icon="📋">List every bot on your account.</Card>
+  <Card title="create_chatbot" icon="✨">Create a new bot — name, welcome message, system prompt, model, color.</Card>
+  <Card title="get_chatbot" icon="🔍">Read a bot's current configuration.</Card>
+  <Card title="update_chatbot" icon="🛠️">Change any of a bot's settings.</Card>
+  <Card title="add_chatbot_knowledge" icon="📚">Add a text snippet to a bot's knowledge base.</Card>
+  <Card title="analyze_chatbot" icon="📊">Pull message, session, and lead counts.</Card>
+</CardGroup>
+
+## Connecting a client
+
+The server is at `https://api.chatty.personaliai.com/mcp`. Most MCP clients just need that URL:
+
+```json title="Claude Desktop — claude_desktop_config.json"
+{
+  "mcpServers": {
+    "chatty": {
+      "url": "https://api.chatty.personaliai.com/mcp"
+    }
+  }
+}
+```
+
+On first use, the client will:
+1. Discover Chatty's OAuth2 authorization server automatically (via `/.well-known/oauth-protected-resource/mcp`).
+2. Register itself as an OAuth2 client (no manual setup — this is [dynamic client registration](/authentication#oauth2-multi-account-access), RFC 7591).
+3. Open your browser to Chatty's consent screen, where you approve access with your existing Chatty login.
+4. Store the resulting token and reuse it for future sessions.
+
+<Note>You're approving access to your Chatty *account* (every bot you own), not one specific bot — the same OAuth2 scope model the Developer API uses. Review what you're approving on the consent screen before clicking Allow.</Note>
+
+## Building your own MCP client
+
+The server speaks standard MCP over streamable HTTP with OAuth2 bearer-token auth — any MCP SDK that supports authenticated remote servers will work. See [OAuth2 authentication](/authentication#oauth2-multi-account-access) for the token exchange if your SDK doesn't handle discovery/registration automatically.
+
+<Warning>Required scopes for MCP tools mirror the REST API: `read` for the list/get/analyze tools, `write` for create/update/add-knowledge. Request both when registering — most MCP clients ask for `chat read write` by default.</Warning>
+
+<PageNav {...prevNext("/guides/mcp")} />
