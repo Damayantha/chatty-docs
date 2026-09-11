@@ -1,4 +1,4 @@
-export const metadata = { title: "Embed the Widget", description: "Add the Chatty chat widget to any website — WordPress, Shopify, WooCommerce, Prestashop, WHMCS, Adobe Commerce, React, or plain HTML — in under 2 minutes." }
+export const metadata = { title: "Embed the Widget", description: "Add the Chatty chat widget to any website - WordPress, Shopify, WooCommerce, Prestashop, WHMCS, Adobe Commerce, React, or plain HTML - in under 2 minutes." }
 
 import { Note, Warning, Tip } from "@/components/mdx/Callout"
 import { Card, CardGroup } from "@/components/mdx/Card"
@@ -8,11 +8,11 @@ import { prevNext } from "@/lib/navigation"
 
 # Embed the Widget
 
-Add your bot to any website with a single `<script>` tag — no framework required.
+Add your bot to any website with a single `<script>` tag - no framework required.
 
 <Note>
 Haven't created and trained a bot yet? Start with [Create a Chat Widget](/guides/create-widget) for
-the full walkthrough — this page assumes you already have a Bot ID.
+the full walkthrough - this page assumes you already have a Bot ID.
 </Note>
 
 The widget renders as **native vector HTML/SVG elements** inside an isolated Shadow DOM container, guaranteeing **100% razor-sharp typography and icons at any zoom level** with complete CSS isolation from host styles.
@@ -21,7 +21,7 @@ The widget renders as **native vector HTML/SVG elements** inside an isolated Sha
 
 1. Open the [Chatty dashboard](https://chatty.personaliai.com/dashboard)
 2. Select your bot in the sidebar
-3. Go to **Embed & Integrate** — pick your platform there for a ready-to-paste snippet and step-by-step instructions
+3. Go to **Embed & Integrate** - pick your platform there for a ready-to-paste snippet and step-by-step instructions
 4. Copy the snippet
 
 ```html title="Paste just before </body>"
@@ -35,7 +35,7 @@ The widget renders as **native vector HTML/SVG elements** inside an isolated Sha
 That's it. A floating launcher button appears in the bottom-right corner of every page, and opens the assistant in an embedded chat panel.
 
 <Warning>
-The script tag must use **`data-id`**, not `data-bot-id` — the widget loader looks for `data-id`
+The script tag must use **`data-id`**, not `data-bot-id` - the widget loader looks for `data-id`
 specifically and won't work if that attribute is named anything else.
 </Warning>
 
@@ -43,13 +43,13 @@ specifically and won't work if that attribute is named anything else.
 
 ## Configuration attributes
 
-All of these are optional — when omitted, the widget uses whatever you've configured in the
+All of these are optional - when omitted, the widget uses whatever you've configured in the
 dashboard's Customizer tab, and updates automatically if you change it there later (no need to
 re-embed).
 
 | Attribute | Default | Description |
 |---|---|---|
-| `data-id` | — | **Required.** Your bot's unique ID. |
+| `data-id` | - | **Required.** Your bot's unique ID. |
 | `data-color` | Bot's saved color | Override the launcher button color (hex, e.g. `#6366f1`). Only affects the button itself, not the chat panel's theme. |
 | `data-style` | Bot's saved style | Override the widget's visual style preset. |
 | `data-position` | `"right"` | Which corner the launcher sits in: `right` or `left`. |
@@ -75,28 +75,28 @@ re-embed).
 Visitors can tap the mic icon in the composer to record a voice message. What happens next is
 controlled per-bot from the dashboard's **Customizer → Voice Messages** setting:
 
-- **Transcribe & send as text** (default) — the recording is transcribed and the text is placed in
+- **Transcribe & send as text** (default) - the recording is transcribed and the text is placed in
   the input box for the visitor to review and edit before sending.
-- **Send as audio message** — the recording itself is sent, and renders as a playable voice-message
+- **Send as audio message** - the recording itself is sent, and renders as a playable voice-message
   bubble (play/pause, waveform, duration) styled to match the bot's design.
 
 <Note>
 Recording requires microphone access. If you're using the [inline iframe embed](#platform-guides)
 instead of the script tag, make sure its `allow` attribute includes `microphone` (see the example
-below) — the script-tag embed doesn't need this since it isn't an iframe.
+below) - the script-tag embed doesn't need this since it isn't an iframe.
 </Note>
 
 ## Voice calls
 
 If **Voice Agent** is enabled for the bot (dashboard sidebar → **Voice Agent**), a phone icon
 appears in the widget header. Tapping it opens a live, full-duplex spoken conversation with the
-bot right inside the widget — a real-time transcript, mic level meter, and mute/hang-up controls —
+bot right inside the widget - a real-time transcript, mic level meter, and mute/hang-up controls -
 with no extra embed code or configuration needed. It works the same way in every embed method on
 this page (script tag, iframe, WordPress, mobile SDKs).
 
 <Note>
 This is a live voice **call** (LiveKit-powered), distinct from the [voice messages](#voice-messages)
-setting above (a visitor recording and sending a single audio clip). Both can be enabled at once —
+setting above (a visitor recording and sending a single audio clip). Both can be enabled at once -
 voice messages happen inline in text chat, voice calls replace the chat view for the call's duration.
 </Note>
 
@@ -117,10 +117,9 @@ window.Chatty.toggle()  // toggle open/closed
 <Accordion title="WordPress">
 
 <Tip>
-The easiest option: install the official **[Chatty WordPress plugin](https://github.com/Damayantha/chatty-wordpress-plugin/releases/latest)**.
-It adds a proper Settings page (Settings → Chatty Widget) — paste your Bot ID and save, no code
-editing at all. [Download the latest release](https://github.com/Damayantha/chatty-wordpress-plugin/releases/download/v1.0.0/chatty-widget.zip),
-then in your WordPress admin go to **Plugins → Add New → Upload Plugin** and upload the zip.
+The easiest option: install the official **[PersonaliAI Customer Support Chatbot](https://wordpress.org/plugins/personaliai-customer-support-chatbot)** plugin directly from WordPress.org.
+It adds a dedicated settings screen (Settings → PersonaliAI Chatbot) - paste your Bot ID and save, with zero code
+editing required. Install via **Plugins → Add New Plugin** by searching for `PersonaliAI Customer Support Chatbot`, or download the plugin from [WordPress.org](https://wordpress.org/plugins/personaliai-customer-support-chatbot).
 </Tip>
 
 Prefer to do it manually instead? Either of these work:
@@ -179,13 +178,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 For plain React (Vite / CRA), add the standard script tag to your `index.html` before `</body>`.
 
-Renders as native vector DOM elements inside an isolated Shadow Root — zero iframes, 100% sharp at any zoom level.
+Renders as native vector DOM elements inside an isolated Shadow Root - zero iframes, 100% sharp at any zoom level.
 
 </Accordion>
 
 <Accordion title="WooCommerce">
 
-WooCommerce runs on WordPress — follow the WordPress steps above:
+WooCommerce runs on WordPress - follow the WordPress steps above:
 
 ```php
 function chatty_widget() { ?>
@@ -220,13 +219,13 @@ module to add script snippets to the footer.
 <Accordion title="Adobe Commerce (Magento)">
 
 1. In your Magento admin, go to **Content → Configuration**, edit your store view, and add the
-snippet under **HTML Head → Scripts and Style Sheets** — or use a CMS Block/Widget.
+snippet under **HTML Head → Scripts and Style Sheets** - or use a CMS Block/Widget.
 2. For a theme-level install instead, edit
 `app/design/frontend/<Vendor>/<theme>/Magento_Theme/layout/default.xml` to reference a custom
 `.phtml` block containing the snippet.
 3. Run `bin/magento cache:flush` after saving.
 
-<Tip>Using a CMS Static Block is the fastest option — it doesn't require a deploy.</Tip>
+<Tip>Using a CMS Static Block is the fastest option - it doesn't require a deploy.</Tip>
 
 </Accordion>
 
@@ -238,7 +237,7 @@ Paste the snippet just before the closing `</body>` tag of your page template:
 <script src="https://chatty.personaliai.com/widget.js" data-id="YOUR_BOT_ID" defer></script>
 ```
 
-This works anywhere you can edit raw HTML — static site generators, custom CMSs, or a platform
+This works anywhere you can edit raw HTML - static site generators, custom CMSs, or a platform
 not listed above.
 
 </Accordion>
