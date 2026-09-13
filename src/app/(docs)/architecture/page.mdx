@@ -20,7 +20,7 @@ Chatty follows a distributed, event-driven architecture decoupled across edge de
 
 ```mermaid
 graph TD
-    Client["Clients<br/>(Embed Widget / React SDK / WP / WhatsApp / Slack)"] --> Ingress["Edge & Ingress<br/>(Cloudflare CDN / TLS 1.3 / WAF)"]
+    Client["Clients<br/>(Embed Widget / React SDK / WP / WhatsApp)"] --> Ingress["Edge & Ingress<br/>(Cloudflare CDN / TLS 1.3 / WAF)"]
     Ingress --> FastApi["Cloud Run ASGI<br/>(FastAPI / Asyncio / Python 3.11+)"]
     
     subgraph Compute["Chatty Core Engine"]
@@ -51,7 +51,7 @@ graph TD
     Distributed rate limiting and ephemeral state backed by <b>Upstash Redis</b> with persistent HTTP connection pooling, preventing TLS renegotiation overhead.
   </Card>
   <Card title="Multi-Channel Adapters" icon="🔌">
-    Native support for the Embed Widget, React SDK, WordPress plugin, WhatsApp Business API, Slack slash commands, and Model Context Protocol (MCP).
+    Native support for the Embed Widget, React SDK, WordPress plugin, WhatsApp Business API, and Model Context Protocol (MCP).
   </Card>
 </CardGroup>
 
