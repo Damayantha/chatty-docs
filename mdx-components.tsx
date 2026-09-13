@@ -8,6 +8,7 @@ import { Expandable } from "@/components/mdx/Expandable";
 import { RequestExample, ResponseExample } from "@/components/mdx/Example";
 import { Frame } from "@/components/mdx/Frame";
 import { ApiEndpointBadge } from "@/components/mdx/ApiEndpointBadge";
+import { WordPressSettingsMockup } from "@/components/mdx/WordPressSettingsMockup";
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
@@ -27,6 +28,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     ResponseExample,
     Frame,
     ApiEndpointBadge,
+    WordPressSettingsMockup,
     ...components,
   };
 }
