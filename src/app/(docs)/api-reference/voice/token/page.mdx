@@ -1,0 +1,43 @@
+﻿export const metadata = { title: "Create Voice Token", description: "Generate a WebRTC access token for LiveKit real-time voice sessions." }
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Create Voice Token
+
+Generate a cryptographically signed JWT token allowing client browsers or mobile applications to connect to a LiveKit WebRTC voice room for sub-second conversational speech.
+
+### Endpoint
+
+```http
+POST /api/voice/token
+```
+
+### Request Headers
+
+| Header | Type | Description |
+| :--- | :--- | :--- |
+| `Authorization` | `string` | Bearer token (`YOUR_BOT_ID` or API Key) |
+| `Content-Type` | `string` | `application/json` |
+
+### Request Body
+
+```json
+{
+  "bot_id": "8f88cb78-5e4a-4a24-9b88-ec922d51fb2c",
+  "visitor_id": "vis_99218274"
+}
+```
+
+### Response (200 OK)
+
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3Mzg1M...",
+  "server_url": "wss://livekit.chatty.personaliai.com",
+  "room_name": "call_8f88cb78-5e4a-4a24-9b88-ec922d51fb2c_vis_99218274"
+}
+```
+
+<PageNav {...prevNext("/api-reference/voice/token")} />

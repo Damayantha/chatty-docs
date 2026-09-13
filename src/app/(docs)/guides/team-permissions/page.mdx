@@ -1,0 +1,38 @@
+﻿export const metadata = { title: "Team & Permissions", description: "Manage agent rosters, role-based access control (RBAC), and SLA-based auto-assign queues." }
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Team & Granular Permissions
+
+Scale your customer support and sales teams with granular access controls, real-time agent presence tracking, and intelligent ticket routing.
+
+---
+
+## Roles & Access Control
+
+<CardGroup cols={3}>
+  <Card title="Owner" icon="👑">
+    Full workspace authority: billing management, API key rotation, team roster invitations, and bot deletion.
+  </Card>
+  <Card title="Admin" icon="🛠️">
+    Bot configuration: knowledge base updates, flow builder, campaign triggers, and integration settings.
+  </Card>
+  <Card title="Agent" icon="🎧">
+    Live Inbox operator: conversation takeover, ticket status updates, meeting scheduling, and visitor notes.
+  </Card>
+</CardGroup>
+
+---
+
+## Live Presence & Auto-Assignment
+
+Agents can toggle their status between **Online**, **Busy**, and **Offline** from the dashboard header:
+
+- **Round-Robin Auto-Dispatch**: Automatically balances incoming visitor tickets across all currently Online agents with available capacity.
+- **First Response SLA**: Monitors ticket wait time and triggers escalation alerts if an incoming conversation is not claimed within the defined SLA window.
+- **Unassign & Reassign**: Reassign tickets seamlessly between agents or return them to the unassigned queue for dispatch.
+
+<PageNav {...prevNext("/guides/team-permissions")} />

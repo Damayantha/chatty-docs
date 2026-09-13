@@ -32,6 +32,10 @@ const withMDX = createMDX({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ["ts", "tsx", "mdx"],
+  experimental: {
+    workerThreads: false,
+    cpus: 1,
+  },
 };
 
 export default withMDX(nextConfig);

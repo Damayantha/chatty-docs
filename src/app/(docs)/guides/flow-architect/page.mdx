@@ -1,0 +1,59 @@
+﻿export const metadata = { title: "Visual Flow Architect", description: "Design conversational trees, conditional logic, and tool automation with the visual drag-and-drop canvas and AI Copilot." }
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Visual Flow Architect
+
+The **Chatty Flow Architect** provides an interactive drag-and-drop canvas that lets you map out deterministic conversational journeys, lead qualification paths, and custom automated tool triggers.
+
+When a visitor interacts with a flow-enabled bot, the state machine executes node-by-node, falling back to autonomous generative AI whenever the visitor strays from the predefined tree.
+
+---
+
+## Canvas Node Types
+
+<CardGroup cols={2}>
+  <Card title="Trigger Nodes" icon="🎯">
+    Defines entry points into the flow: first widget open, button click, page URL match, or specific keyword intent.
+  </Card>
+  <Card title="Message & Question Nodes" icon="💬">
+    Presents structured messages, multiple-choice buttons, quick replies, or text input prompts to capture visitor responses.
+  </Card>
+  <Card title="Condition & Branching" icon="🔀">
+    Evaluates variables (e.g. `visitor_lead.budget > 5000` or `device === "mobile"`) to fork conversational pathways.
+  </Card>
+  <Card title="Tool & Handoff Nodes" icon="🛠️">
+    Executes backend operations: check calendar availability, trigger a webhook, capture a lead, or transfer to a live human agent.
+  </Card>
+</CardGroup>
+
+---
+
+## AI Flow Copilot
+
+Instead of manually drafting every branch, you can describe your goal in natural language to the Chatty AI Flow Copilot:
+
+> *"Build a lead qualification flow for a dental clinic. Ask for the patient's insurance provider, check if they need emergency treatment, propose a 30-minute consultation if yes, or direct them to pricing if no."*
+
+The Copilot generates the complete React Flow JSON graph with node coordinates, conditional edges, and fallback triggers automatically.
+
+---
+
+## Flow Architecture API
+
+Save and update flow definitions programmatically:
+
+```bash
+curl -X POST https://api.chatty.personaliai.com/api/flow/generate \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "bot_id": "YOUR_BOT_ID",
+    "prompt": "Create an enterprise customer support escalation flow."
+  }'
+```
+
+<PageNav {...prevNext("/guides/flow-architect")} />

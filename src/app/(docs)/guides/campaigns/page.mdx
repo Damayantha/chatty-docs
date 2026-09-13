@@ -1,0 +1,42 @@
+﻿export const metadata = { title: "Proactive Campaigns", description: "Engage website visitors proactively with contextual teaser messages, scroll triggers, and behavioral targeting." }
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Proactive Campaigns
+
+Rather than waiting for visitors to initiate a chat, **Campaigns** pop up targeted conversational teasers and promotional bubbles based on visitor behavior, current URL path, and referral source.
+
+Proactive nudges increase website conversion rates by up to **3.2x** by presenting relevant answers at high-intent decision moments.
+
+---
+
+## Trigger Rules & Targeting
+
+<CardGroup cols={2}>
+  <Card title="Time Delay" icon="⏱️">
+    Displays the teaser message after the visitor has spent <i>N</i> seconds on the page (e.g. 15 seconds on a pricing comparison table).
+  </Card>
+  <Card title="Scroll Depth" icon="📜">
+    Triggers when the visitor scrolls down a specific percentage of the page (e.g. 50% down a case study or feature breakdown).
+  </Card>
+  <Card title="Page Path Filtering" icon="🔗">
+    Target or exclude specific URLs using glob patterns (e.g. `/pricing*`, `/checkout/*`, `!/docs/*`).
+  </Card>
+  <Card title="Frequency Caps" icon="🔄">
+    Configurable display frequencies: <b>Once per session</b>, <b>Once per user</b>, or <b>Every page visit</b>.
+  </Card>
+</CardGroup>
+
+---
+
+## Managing Campaigns in Dashboard
+
+1. Navigate to the **Campaigns** tab in the Chatty Dashboard.
+2. Click **Create Campaign** and select your target bot.
+3. Configure the **Teaser Headline**, **Call-to-Action Text**, and **Trigger Conditions**.
+4. Activate the campaign to start displaying teasers on your live site immediately.
+
+<PageNav {...prevNext("/guides/campaigns")} />

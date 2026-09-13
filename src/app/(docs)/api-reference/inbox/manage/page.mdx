@@ -1,0 +1,55 @@
+﻿export const metadata = { title: "Inbox & Auto-Assign API", description: "Manage live ticket sessions, assignments, and automated agent routing." }
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Inbox & Auto-Assign API
+
+Programmatically query live conversation sessions, update ticket statuses, and trigger auto-assignment across online agents.
+
+### 1. List Sessions
+
+```http
+GET /api/inbox/sessions?bot_id={bot_id}&status=open
+```
+
+#### Response (200 OK)
+
+```json
+{
+  "sessions": [
+    {
+      "id": "sess_12345",
+      "bot_id": "8f88cb78-5e4a-4a24-9b88-ec922d51fb2c",
+      "status": "open",
+      "assigned_to": "agent_user_456",
+      "visitor_name": "Sarah Connor",
+      "created_at": "2026-09-13T10:00:00Z"
+    }
+  ]
+}
+```
+
+---
+
+### 2. Auto-Assign Session
+
+Dispatch an unassigned ticket to the next available agent based on round-robin capacity and online status:
+
+```http
+POST /api/inbox/sessions/{session_id}/auto-assign
+```
+
+#### Response (200 OK)
+
+```json
+{
+  "success": true,
+  "session_id": "sess_12345",
+  "assigned_to": "agent_user_456",
+  "assigned_agent_name": "Alex Murphy"
+}
+```
+
+<PageNav {...prevNext("/api-reference/inbox/manage")} />
