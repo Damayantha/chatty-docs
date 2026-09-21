@@ -63,6 +63,14 @@ In the Chatty Dashboard, navigate to **Integrations &rarr; WhatsApp Business Int
 | **Verify Token** | The exact token string entered in the Meta Webhook configuration |
 | **App Secret** | Your Meta App Secret (used for cryptographic HMAC payload verification) |
 
+After saving the credentials, use **Test connection** in the WhatsApp card. This performs a read-only Graph API lookup of the configured phone number; it does not send a message. A successful check confirms that the phone-number ID and access token are valid.
+
+For inbound production messages, the Meta app must be **published**, the WABA must be subscribed to the app, and the `messages` webhook field must show **Subscribed**. Meta's dashboard sample webhook tester only proves that the callback can receive a test payload; it does not simulate a real customer conversation.
+
+<Warning>
+If a booking reply contains a link, Chatty replaces model-generated or legacy links with a signed `https://chatty.personaliai.com/book/...` URL bound to the WhatsApp sender. Older messages may still contain a previously generated link and are not rewritten.
+</Warning>
+
 ---
 
 ## Supported WhatsApp Message Formats
@@ -81,6 +89,12 @@ In the Chatty Dashboard, navigate to **Integrations &rarr; WhatsApp Business Int
     Render quick-reply buttons (e.g. <i>"Book a Call"</i>, <i>"View Pricing"</i>, <i>"Talk to Human"</i>) for friction-free navigation.
   </Card>
 </CardGroup>
+
+---
+
+## Ecommerce Product Questions
+
+Chatty can answer product questions from an indexed catalog, including image-based requests. Connect WooCommerce for automatic product, price, and stock synchronization, or use the manual catalog/webhook mode to push product and inventory changes from your own system. The same assistant route works on web and WhatsApp; WhatsApp responses are rendered as concise text, approved purchase links, and optional quick-reply buttons.
 
 ---
 
