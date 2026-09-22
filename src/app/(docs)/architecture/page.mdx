@@ -8,33 +8,75 @@ import { prevNext } from "@/lib/navigation"
 
 # Platform Architecture
 
-Chatty is built as a high-throughput, enterprise-grade AI chatbot platform designed to serve thousands of concurrent visitors with sub-second streaming latency, zero data cross-contamination, and strict tenant isolation.
+Chatty is a multi-tenant AI customer-support platform with a Next.js frontend,
+FastAPI application services, Supabase-backed persistence, streaming chat, RAG,
+voice, booking, omnichannel webhooks, and MCP access. The managed-Supabase
+profile is the default for both Chatty Cloud and self-hosted application
+containers.
 
-This document breaks down the underlying infrastructure, real-time request lifecycle, database pooling, and defense-in-depth security model.
+This document breaks down the request flow, data boundaries, and deployment
+security model without implying that a self-hosted deployment must replace
+Supabase or use a specific cloud vendor.
 
 ---
 
 ## High-Level Topology
 
-Chatty follows a distributed, event-driven architecture decoupled across edge delivery, asynchronous API compute, managed vector search, and external LLM provider clusters:
+Chatty follows a two-service application boundary: the public frontend calls
+the API over HTTPS, and the API talks to managed Supabase plus optional
+providers. The same containers can run on a VPS, Railway, Render, or a
+Heroku-style container host:
 
-```mermaid
-graph TD
-    Client["Clients<br/>(Embed Widget / React SDK / WP / WhatsApp)"] --> Ingress["Edge & Ingress<br/>(Cloudflare CDN / TLS 1.3 / WAF)"]
-    Ingress --> FastApi["Cloud Run ASGI<br/>(FastAPI / Asyncio / Python 3.11+)"]
-    
-    subgraph Compute["Chatty Core Engine"]
-        FastApi --> RateLimit["Upstash Redis<br/>(Token Bucket / HTTP Keep-Alive Pool)"]
-        FastApi --> Guardrails["Guardrails & Anti-SSRF<br/>(IP Pinning & URL Parser)"]
-        FastApi --> Orchestrator["LLM Orchestration Engine<br/>(Gemini 2.5 Flash/Pro, LangChain)"]
-    end
+~~~mermaid
+flowchart TB
+    classDef actor fill:#f8fafc,stroke:#64748b,color:#0f172a
+    classDef edge fill:#eff6ff,stroke:#2563eb,color:#1e3a8a
+    classDef app fill:#ecfdf5,stroke:#059669,color:#064e3b
+    classDef data fill:#f0fdfa,stroke:#0f766e,color:#134e4a
+    classDef integration fill:#fff7ed,stroke:#ea580c,color:#7c2d12
+    classDef deploy fill:#f5f3ff,stroke:#7c3aed,color:#4c1d95
 
-    subgraph DataPlane["Data & Storage Plane"]
-        Orchestrator --> DB["Supabase Postgres 15+<br/>(pgvector / HNSW Cosine Index / 64-Pool)"]
-        Orchestrator --> Storage["Supabase Storage<br/>(Media, Voice Notes, Signed URLs)"]
-        Orchestrator --> Calendar["Calendar APIs<br/>(Google Meet / MS Teams / Zoom)"]
+    users["Visitors · operators · WhatsApp · Slack · MCP"]:::actor --> edge["TLS / custom domain / rate limits"]:::edge
+    edge --> frontend["frontend/ — Next.js dashboard + widget"]:::app
+    frontend -->|HTTPS| api["backend/ — FastAPI API + workers"]:::app
+
+    subgraph supabase["Managed Supabase — default profile"]
+        auth["Auth"]:::data
+        db["Postgres + pgvector + RLS"]:::data
+        files["Storage"]:::data
+        updates["Realtime"]:::data
     end
-```
+    api --> auth
+    api --> db
+    api --> files
+    api --> updates
+
+    subgraph providers["Optional providers"]
+        llm["Gemini / OpenAI / Anthropic"]:::integration
+        calendar["Google / Microsoft / Zoom"]:::integration
+        channels["Meta WhatsApp / Slack"]:::integration
+        voice["LiveKit Cloud or self-hosted"]:::integration
+    end
+    api --> llm
+    api --> calendar
+    api --> channels
+    api --> voice
+
+    subgraph targets["Application deployment targets"]
+        docker["Docker Compose / VPS"]:::deploy
+        railway["Railway"]:::deploy
+        render["Render Blueprint"]:::deploy
+        heroku["Heroku-style host"]:::deploy
+    end
+    docker -. same frontend + API images .-> frontend
+    docker -. same frontend + API images .-> api
+    railway -. same frontend + API images .-> frontend
+    railway -. same frontend + API images .-> api
+    render -. same frontend + API images .-> frontend
+    render -. same frontend + API images .-> api
+    heroku -. same frontend + API images .-> frontend
+    heroku -. same frontend + API images .-> api
+~~~
 
 ---
 
@@ -42,13 +84,13 @@ graph TD
 
 <CardGroup cols={2}>
   <Card title="Asynchronous ASGI Engine" icon="⚡">
-    Built on <b>FastAPI</b> and <b>Uvicorn</b> running on Google Cloud Run. Every network I/O call (database queries, vector similarity, Redis counters, LLM tokens) is 100% non-blocking.
+    Built on <b>FastAPI</b> and <b>Uvicorn</b> inside the API container. Every network I/O call (database queries, vector similarity, optional Redis counters, LLM tokens) is non-blocking.
   </Card>
   <Card title="Vector RAG Pipeline" icon="🧠">
     Powered by <b>Supabase PostgreSQL</b> with <b>pgvector</b>. Uses 768-dimensional embeddings generated by Google's `text-embedding-004` model with indexed HNSW cosine distance search.
   </Card>
   <Card title="Persistent Edge Rate Limiting" icon="🛡️">
-    Distributed rate limiting and ephemeral state backed by <b>Upstash Redis</b> with persistent HTTP connection pooling, preventing TLS renegotiation overhead.
+    Optional distributed rate limiting and ephemeral state backed by <b>Upstash Redis</b>. The managed-Supabase profile works without provisioning a local Redis service.
   </Card>
   <Card title="Multi-Channel Adapters" icon="🔌">
     Native support for the Embed Widget, React SDK, WordPress plugin, WhatsApp Business API, and Model Context Protocol (MCP).
@@ -65,8 +107,8 @@ When a visitor interacts with a Chatty widget or API client, the request travers
 sequenceDiagram
     autonumber
     actor Visitor
-    participant Edge as Edge / Cloud Run
-    participant Redis as Upstash Redis
+    participant Edge as Public edge / API container
+    participant Redis as Optional Redis
     participant DB as Postgres (pgvector)
     participant LLM as Google Gemini 2.5
     
@@ -89,8 +131,11 @@ sequenceDiagram
 ### 1. Ingress & Origin Allowlist
 Public widget endpoints check the incoming HTTP `Origin` header against the bot's configured **domain allowlist**. If a domain is not authorized, the backend immediately terminates the connection with `403 Forbidden` and injects `Content-Security-Policy: frame-ancestors 'none'` to block unauthorized iframe embedding.
 
-### 2. Upstash Distributed Rate Limiting
-To protect backend workers from volumetric abuse, requests pass through an Upstash Redis token bucket algorithm. Counters are partitioned by client IP (for widget traffic) or SHA-256 API key hash (for developer API calls). Upstash HTTP connections are pooled with keep-alive, avoiding TCP handshake penalties.
+### 2. Distributed rate limiting (optional)
+To protect backend workers from volumetric abuse, deployments can use the
+Upstash Redis token bucket integration. Counters are partitioned by client IP
+(for widget traffic) or SHA-256 API key hash (for developer API calls). The
+managed-Supabase default still runs without a locally provisioned Redis.
 
 ### 3. Session Resolution & Human Takeover Check
 The conversation session UUID is retrieved from PostgreSQL. If the session has `ai_paused: true` (e.g. a customer support agent initiated a human takeover), the AI pipeline is bypassed, and the visitor message is routed directly to the Live Inbox dashboard.
@@ -111,13 +156,13 @@ The orchestrator dispatches the assembled context to Google Gemini with streamin
 Database connection exhaustion is the most common failure point in AI applications that handle long-running LLM streams. Chatty mitigates this with a robust pooling architecture:
 
 ```
-[Cloud Run Instances] (Concurrency: 50 per instance)
+[API container instances]
          │
          ├── Worker 1 ──┐
          ├── Worker 2 ──┼──> [Async SQLAlchemy Engine]
          └── Worker N ──┘            │
                                      ▼
-                     [64-Worker Connection Pool]
+                     [Application connection pool]
                         - pool_size: 20
                         - max_overflow: 44
                         - pool_timeout: 30s
@@ -131,7 +176,7 @@ Database connection exhaustion is the most common failure point in AI applicatio
 
 <AccordionGroup>
   <Accordion title="Pre-Ping & Automatic Recycling">
-    Database connections are configured with `pool_pre_ping=True` and a 30-minute recycle window (`pool_recycle=1800`). Any dead or dropped connections caused by network partitions or Cloud Run scale-down events are evicted before a query attempts execution.
+    Database connections are configured with `pool_pre_ping=True` and a 30-minute recycle window (`pool_recycle=1800`). Dead connections caused by network partitions are evicted before a query attempts execution.
   </Accordion>
   <Accordion title="Immediate Connection Release During Streaming">
     FastAPI sessions only hold a database connection while loading session history and vector chunks. The database transaction is closed **before** the long-running LLM streaming loop starts. Once the stream ends, a new pooled connection is acquired for a few milliseconds to save the completed response.
