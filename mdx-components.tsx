@@ -14,10 +14,17 @@ import { Children, isValidElement } from "react";
 
 function MDXPre({ children, ...props }: React.ComponentPropsWithoutRef<"pre">) {
   const child = Children.toArray(children)[0];
-  if (isValidElement<{ className?: string; children?: React.ReactNode }>(child)) {
-    const className = child.props.className ?? "";
-    if (className.includes("language-mermaid")) {
-      const source = String(child.props.children ?? "").trim();
+  if (isValidElement<{ className?: string; "data-language"?: string; children?: React.ReactNode }>(child)) {
+    const className = typeof child.props.className === "string" ? child.props.className : "";
+    const language = child.props["data-language"] ?? "";
+    if (language === "mermaid" || className.includes("language-mermaid")) {
+      const textContent = (node: React.ReactNode): string => {
+        if (typeof node === "string" || typeof node === "number") return String(node);
+        if (Array.isArray(node)) return node.map(textContent).join("");
+        if (isValidElement<{ children?: React.ReactNode }>(node)) return textContent(node.props.children);
+        return "";
+      };
+      const source = textContent(child.props.children).trim();
       return <Mermaid chart={source} />;
     }
   }
