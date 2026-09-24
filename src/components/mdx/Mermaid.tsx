@@ -67,9 +67,14 @@ export function Mermaid({ chart }: MermaidProps) {
 
   return (
     <div
-      className="my-8 overflow-x-auto rounded-2xl border border-[--border] bg-[--surface] p-4 shadow-sm [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full"
+      className="my-8 overflow-x-auto rounded-2xl border border-[--border] bg-[--surface] p-4 shadow-sm"
       aria-label="Architecture diagram"
-      dangerouslySetInnerHTML={{ __html: svg }}
-    />
+      tabIndex={0}
+    >
+      <div
+        className="min-w-[1400px] [&_svg]:block [&_svg]:h-auto [&_svg]:w-full [&_svg]:max-w-none"
+        dangerouslySetInnerHTML={{ __html: svg }}
+      />
+    </div>
   );
 }
