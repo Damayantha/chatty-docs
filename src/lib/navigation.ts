@@ -48,7 +48,6 @@ export const navigation: NavGroup[] = [
       { title: "React & Next.js",      href: "/guides/react-sdk" },
       { title: "WordPress Plugin",     href: "/guides/wordpress" },
       { title: "WhatsApp Channel",     href: "/guides/whatsapp" },
-      { title: "Slack Slash Command",  href: "/guides/slack" },
       { title: "MCP Server",           href: "/guides/mcp" },
       { title: "Per-Bot Integrations", href: "/guides/per-bot-integrations" },
     ],

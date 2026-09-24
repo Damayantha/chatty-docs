@@ -10,6 +10,8 @@ import { prevNext } from "@/lib/navigation"
 
 Chatty turns conversations into booked demos and consultations without sending visitors to third-party scheduling links. The AI bot checks real-time calendar availability, calculates timezone offsets, proposes free slots, and generates Google Meet, Microsoft Teams, or Zoom links natively inside the chat thread.
 
+When a customer starts from WhatsApp, the booking link uses the canonical Chatty host (`chatty.personaliai.com`) and carries a short-lived, phone-bound signature. After the visitor confirms a slot, the calendar invite and meeting details can be sent back into the same WhatsApp thread.
+
 ---
 
 ## Supported Providers

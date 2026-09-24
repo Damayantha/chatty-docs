@@ -1,40 +1,35 @@
 import { MetadataRoute } from "next";
+import { flatNav } from "@/lib/navigation";
 
 const BASE = "https://docs.chatty.personaliai.com";
 
-const pages = [
-  { url: "/introduction",                        priority: 1.0 },
-  { url: "/quickstart",                          priority: 0.9 },
-  { url: "/authentication",                      priority: 0.8 },
-  { url: "/rate-limits",                         priority: 0.7 },
-  { url: "/errors",                              priority: 0.7 },
-  { url: "/api-reference/chat/send-message",     priority: 0.9 },
-  { url: "/api-reference/bot/get-details",       priority: 0.8 },
-  { url: "/api-reference/leads/list",            priority: 0.8 },
-  { url: "/api-reference/conversations/list",    priority: 0.8 },
-  { url: "/api-reference/conversations/get",     priority: 0.8 },
-  { url: "/api-reference/conversations/delete",  priority: 0.7 },
-  { url: "/api-reference/knowledge/list",        priority: 0.8 },
-  { url: "/api-reference/knowledge/add",         priority: 0.8 },
-  { url: "/api-reference/knowledge/delete",      priority: 0.7 },
-  { url: "/api-reference/analytics/summary",     priority: 0.8 },
-  { url: "/api-reference/usage/stats",           priority: 0.7 },
-  { url: "/guides/create-widget",                priority: 0.9 },
-  { url: "/guides/embed-widget",                 priority: 0.9 },
-  { url: "/guides/mobile-sdks",                  priority: 0.8 },
-  { url: "/guides/webhooks",                     priority: 0.8 },
-  { url: "/guides/byok",                         priority: 0.7 },
-  { url: "/guides/languages",                    priority: 0.7 },
-  { url: "/guides/google-auth-setup",            priority: 0.7 },
-  { url: "/security",                            priority: 0.7 },
-  { url: "/changelog",                           priority: 0.6 },
-];
-
 export default function sitemap(): MetadataRoute.Sitemap {
-  return pages.map(({ url, priority }) => ({
-    url: BASE + url,
-    lastModified: new Date(),
-    changeFrequency: url === "/changelog" ? "weekly" : "monthly",
-    priority,
-  }));
+  const navItems = flatNav();
+
+  const entries: MetadataRoute.Sitemap = [
+    {
+      url: BASE,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    ...navItems.map((item) => {
+      let priority = 0.8;
+      if (item.href === "/introduction" || item.href === "/quickstart") priority = 1.0;
+      else if (item.href.startsWith("/guides/")) priority = 0.9;
+      else if (item.href.startsWith("/api-reference/")) priority = 0.8;
+      else if (item.href === "/changelog") priority = 0.6;
+      else if (item.href === "/security") priority = 0.7;
+
+      return {
+        url: `${BASE}${item.href}`,
+        lastModified: new Date(),
+        changeFrequency: item.href === "/changelog" ? ("weekly" as const) : ("monthly" as const),
+        priority,
+      };
+    }),
+  ];
+
+  return entries;
 }
+
