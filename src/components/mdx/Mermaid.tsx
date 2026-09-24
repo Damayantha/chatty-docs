@@ -54,13 +54,22 @@ export function Mermaid({ chart }: MermaidProps) {
     );
   }
 
+  if (!svg) {
+    return (
+      <div
+        className="my-8 overflow-x-auto rounded-2xl border border-[--border] bg-[--surface] p-4 shadow-sm"
+        aria-label="Architecture diagram"
+      >
+        <div className="h-24 animate-pulse rounded-xl bg-[--surface-muted]" aria-hidden="true" />
+      </div>
+    );
+  }
+
   return (
     <div
       className="my-8 overflow-x-auto rounded-2xl border border-[--border] bg-[--surface] p-4 shadow-sm [&_svg]:mx-auto [&_svg]:h-auto [&_svg]:max-w-full"
       aria-label="Architecture diagram"
-      dangerouslySetInnerHTML={svg ? { __html: svg } : undefined}
-    >
-      {!svg && <div className="h-24 animate-pulse rounded-xl bg-[--surface-muted]" aria-hidden="true" />}
-    </div>
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
   );
 }
