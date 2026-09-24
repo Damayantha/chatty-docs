@@ -104,6 +104,48 @@ Chatty retries failed deliveries (non-2xx or timeout) with exponential back-off:
 
 <Tip>Return a `200` as fast as possible — offload processing to a queue. Webhooks time out after **10 seconds**.</Tip>
 
+## Product catalog webhooks
+
+Manual products and media items can be updated from an ERP, PIM, store, or
+spreadsheet automation. Open **Dashboard → Knowledge → Products & Media → Add
+Custom Product** (or **Add Video Clip**), set the item's **External ID**, and
+enable the catalog webhook. Chatty shows a separate signed delivery URL and
+one-time signing secret for each bot.
+
+### Product identity
+
+The `bot_id` in the catalog webhook URL scopes the lookup. Within that bot,
+Chatty matches the exact, case-sensitive `external_id` from your source system.
+Keep this value stable and unique for every manual catalog item. Use an ERP
+key, SKU namespace, or provider ID such as `ERP-10042` or
+`shopify:gid://shopify/Product/123`; do not use a title, URL, price, array
+position, or Chatty's internal UUID.
+
+| Field | Purpose |
+|---|---|
+| `bot_id` (URL) | Selects the bot's catalog. |
+| `external_id` | Stable source-system key used for create, update, and delete. |
+| `item_id` (response) | Chatty's internal UUID, returned for diagnostics only. |
+| `sku` | Search/display data; it is not the webhook lookup key. |
+
+Send the same `external_id` for every lifecycle event:
+
+```json
+{
+  "event": "product.updated",
+  "external_id": "ERP-10042",
+  "item": {
+    "price": 79.99,
+    "metadata": {"in_stock": true}
+  }
+}
+```
+
+`external_id` is required for updates and deletes and is limited to 256
+characters. If duplicate IDs exist in a bot, Chatty returns `409` rather than
+changing an arbitrary product. The [WhatsApp and commerce guide](/guides/whatsapp)
+also covers the signed payload and catalog event details.
+
 ## Testing locally
 
 Use a tunnel like [ngrok](https://ngrok.com) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) to expose your local server:
