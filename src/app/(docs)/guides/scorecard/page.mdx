@@ -1,0 +1,121 @@
+export const metadata = { 
+  title: "Performance Scorecard & Auditing", 
+  description: "Evaluate your chatbot with an independent 5-pillar operational assurance audit and A-F letter grade." 
+}
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { Accordion, AccordionGroup } from "@/components/mdx/Accordion"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# 📊 Chatbot Performance Scorecard
+
+Most AI evaluations measure raw model benchmarks: token generation speed, perplexity, or MMLU scores. They fail to answer the most crucial business question:
+
+> **"Is your AI chatbot actually converting visitors and solving customer problems reliably?"**
+
+The **Chatty Performance Scorecard** grades chatbots on an **A+ to F** scale across five core operational pillars, providing engineering, compliance, and marketing teams with a complete operational health assessment in under 60 seconds.
+
+---
+
+## 🏆 The Five Operational Pillars
+
+<CardGroup cols={2}>
+  <Card title="1. Conversion & Revenue Intent (25%)" icon="target">
+    Measures lead capture rate, meeting booking rate, and proactive campaign CTRs. Target: &ge; 15% session-to-lead conversion.
+  </Card>
+
+  <Card title="2. Engagement & Deflection (20%)" icon="message-square">
+    Measures autonomous resolution without human intervention or ticket escalation. Target: &ge; 85% deflection rate.
+  </Card>
+
+  <Card title="3. Accuracy & Grounding (25%)" icon="shield-check">
+    Measures RAG precision, anti-hallucination guardrails, and valid tool executions. Target: &ge; 98% execution consistency.
+  </Card>
+
+  <Card title="4. Reliability & Latency (15%)" icon="zap">
+    Measures p95 first-token latency, uptime, and fallback resilience. Target: p95 &lt; 1,500ms for chat, &lt; 500ms for voice.
+  </Card>
+</CardGroup>
+
+<Card title="5. Customer Satisfaction & CSAT (15%)" icon="smile">
+  Measures verified post-chat 1–5 star ratings and positive sentiment balance. Target: &ge; 4.5/5.0 average CSAT score.
+</Card>
+
+---
+
+## 📈 Letter Grade Scale
+
+| Grade | Composite Score | Operational Status | Interpretation |
+|---|---|---|---|
+| **A+** | 93 – 100% | **Exceptional** | World-class conversion and autonomous deflection. Scale ready. |
+| **A** | 90 – 92.9% | **Excellent** | Strong lead generation, low hallucination risk, high customer satisfaction. |
+| **A-** | 87 – 89.9% | **Very Good** | Solid business metrics with minor optimization opportunities in edge cases. |
+| **B+** | 83 – 86.9% | **Good** | Reliable everyday performance; review unhandled queries to boost deflection. |
+| **B** | 80 – 82.9% | **Competent** | Functional customer support bot; needs proactive campaign tuning. |
+| **C** | 65 – 74.9% | **Needs Attention** | Elevated human escalation rate or noticeable latency bottlenecks. |
+| **D** | 55 – 64.9% | **Poor** | High error rates or lack of relevant knowledge documents. |
+| **F** | &lt; 55% | **Failing** | Critical misconfiguration; bot is causing customer friction. |
+
+---
+
+## 🛠️ Three Ways to Run an Audit
+
+### 1. Terminal CLI (Instant Evaluation)
+
+Chatty includes a standalone auditor script that prints a rich terminal scorecard:
+
+```bash
+# Run with synthetic benchmark sample:
+python scripts/audit_bot.py --sample
+
+# Audit your live bot instance:
+python scripts/audit_bot.py --bot-id <YOUR_BOT_UUID> --days 30
+
+# Export markdown report to file:
+python scripts/audit_bot.py --bot-id <YOUR_BOT_UUID> --format markdown --output audit-report.md
+```
+
+### 2. Dashboard REST API
+
+Integrate scorecard reporting into internal dashboards or CI/CD pipelines:
+
+```http
+GET /api/admin/analytics/scorecard?bot_id=YOUR_BOT_ID&days=30
+Authorization: Bearer <SUPABASE_JWT_OR_API_KEY>
+```
+
+### 3. Model Context Protocol (MCP) Inside Claude or Cursor
+
+Ask your AI coding assistant:
+
+> *"Run an audit on my bot `8f9024b1-e25c-4122-8d77-a82a6fce921b` and explain the scorecard."*
+
+The MCP client invokes `get_bot_performance_scorecard` or reads `chatty://bots/{bot_id}/scorecard` automatically.
+
+---
+
+## 🚀 Optimization Playbook
+
+<AccordionGroup>
+  <Accordion title="How to improve Conversion (Score < 80%)">
+    1. Go to **Flows** and insert a **Lead Capture Form** node early in high-intent conversational branches.
+    2. Enable **Exit-Intent Campaigns** in the Campaigns tab to recover abandoning visitors.
+    3. Connect Google/Outlook Calendar in **Integrations** for 1-click meeting bookings.
+  </Accordion>
+
+  <Accordion title="How to improve Deflection (Score < 80%)">
+    1. Check **Inbox → Unanswered Queries** to see what visitors are asking.
+    2. Upload missing PDFs or re-crawl your website sitemap in **Knowledge**.
+    3. Lower temperature in **Settings** (0.2–0.4) for stricter factual adherence.
+  </Accordion>
+
+  <Accordion title="How to improve Latency (p95 > 2,000ms)">
+    1. Switch default model to `gemini-2.5-flash-lite` in **Settings**.
+    2. Configure Upstash Redis rate limiting and embedding caching in `backend/.env`.
+    3. Ensure streaming SSE is enabled on all widget embeds.
+  </Accordion>
+</AccordionGroup>
+
+<PageNav {...prevNext("/guides/scorecard")} />

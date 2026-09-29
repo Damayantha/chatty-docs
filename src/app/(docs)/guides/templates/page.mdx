@@ -1,0 +1,78 @@
+export const metadata = { 
+  title: "Industry Bot Starter Templates", 
+  description: "Deploy production-tuned chatbot starter kits for E-Commerce, Healthcare, Real Estate, Hospitality, and SaaS." 
+}
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# 📦 Industry Bot Starter Templates
+
+Chatty ships with pre-configured, domain-tuned starter kits. Each template includes a specialized system prompt with boundary constraints, starter knowledge base articles, recommended color palettes, and sample test prompts.
+
+Launch a production-grade AI assistant in under 60 seconds without starting from a blank page.
+
+---
+
+## 🗂️ The 5 Production Starter Kits
+
+<CardGroup cols={2}>
+  <Card title="🛍️ E-Commerce & Retail" href="/guides/templates#retail-e-commerce">
+    `templates/ecommerce-store.json`<br/>
+    Sizing advice, return policy workflows, order lookup, and cart recovery discounts.
+  </Card>
+
+  <Card title="🏥 Healthcare & Dental" href="/guides/templates#healthcare-dental">
+    `templates/healthcare-clinic.json`<br/>
+    Patient triage, emergency medical disclaimers, insurance FAQs, and doctor scheduling.
+  </Card>
+
+  <Card title="🏡 Real Estate & Brokerage" href="/guides/templates#real-estate">
+    `templates/real-estate-agency.json`<br/>
+    Buyer budget/timeline qualification, neighborhood guides, and private tour booking.
+  </Card>
+
+  <Card title="🍝 Dining & Hospitality" href="/guides/templates#hospitality-dining">
+    `templates/restaurant-hospitality.json`<br/>
+    Table reservations, allergy and dietary safety, private event dining, and wine corkage.
+  </Card>
+</CardGroup>
+
+<Card title="⚡ B2B SaaS & Developer Tools" href="/guides/templates#b2b-saas">
+  `templates/saas-customer-support.json`<br/>
+  API troubleshooting, HMAC webhook verification, rate limit diagnosis, and SLA ticket escalation.
+</Card>
+
+---
+
+## 🚀 How to Import a Template
+
+### Method 1: Using the Import CLI Script
+
+Run the provided helper script pointing to your running Chatty instance:
+
+```bash
+# Preview template contents without applying:
+python scripts/import_template.py --template templates/ecommerce-store.json --dry-run
+
+# Import into your live Chatty instance:
+export CHATTY_BACKEND_URL="http://localhost:8000"
+export CHATTY_API_KEY="your-jwt-or-api-key"
+python scripts/import_template.py --template templates/ecommerce-store.json
+```
+
+<Tip>
+The importer creates the chatbot entity, applies default styling tokens, and seeds the initial knowledge base articles in a single transactional run.
+</Tip>
+
+### Method 2: Import via MCP (Claude Desktop, Cursor, Codex)
+
+Ask your AI coding assistant:
+
+> *"Import the `templates/saas-customer-support.json` template to create a new developer support chatbot for my workspace."*
+
+Your MCP client reads the template JSON and invokes `create_chatbot` and `add_chatbot_knowledge` automatically.
+
+<PageNav {...prevNext("/guides/templates")} />

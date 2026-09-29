@@ -1,0 +1,102 @@
+export const metadata = { 
+  title: "AI Coding Plugins & Marketplaces", 
+  description: "Connect Claude Code, Cursor IDE, Claude Desktop, and Windsurf to Chatty's 55-tool MCP server." 
+}
+
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# 🤖 AI Coding Tools & Marketplace Integration
+
+Connect your favorite AI coding assistant directly to Chatty's **55-tool Model Context Protocol (MCP) server**.
+
+Manage chatbots, generate visual flows, audit performance, and review lead analytics directly from your conversational coding workflow without switching context.
+
+---
+
+## ⚡ 1. Claude Code CLI Integration
+
+Chatty publishes an official Claude Code plugin manifest under `.claude-plugin/marketplace.json`.
+
+### Add Marketplace:
+Inside your Claude Code session, register Chatty:
+
+```bash
+/plugin marketplace add PersonaliAI/chatty
+```
+
+Or install directly:
+```bash
+claude plugin install chatty
+```
+
+Once installed, ask Claude:
+> *"Audit my Chatty bot `8f9024b1-e25c-4122-8d77-a82a6fce921b` and show the 5-pillar scorecard."*  
+> *"Create a new customer support chatbot for my store and seed it with `templates/ecommerce-store.json`."*
+
+---
+
+## 💻 2. Cursor IDE Integration
+
+Cursor supports both native MCP servers and repository rules.
+
+### Step 1: Configure MCP in Cursor
+1. Open Cursor **Settings** (`Cmd + ,` or `Ctrl + ,`).
+2. Go to **Features → MCP Servers → Add New MCP Server**.
+3. Fill in:
+   - **Name:** `chatty`
+   - **Type:** `sse`
+   - **Server URL:** `https://your-backend-domain/mcp` (or `http://localhost:8000/mcp`)
+4. Authorize via the OAuth consent popup on first connect.
+
+### Step 2: Cursor Rules Active
+The Chatty repository includes:
+- `.cursor/rules/chatty.mdc`: Automatic system guidance on Chatty architecture, tools, and security.
+- `.cursorrules`: Universal editor prompt rules.
+
+Ask Cursor's composer (`Ctrl + I` or `Cmd + I`):
+> *"Use `@chatty` to generate a 4-step lead qualification flow and run dry-run validation."*
+
+---
+
+## 🖥️ 3. Claude Desktop Integration
+
+Edit your Claude Desktop configuration file:
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+
+Add the Chatty MCP server:
+
+```json
+{
+  "mcpServers": {
+    "chatty": {
+      "url": "https://api.chatty.personaliai.com/mcp"
+    }
+  }
+}
+```
+
+Restart Claude Desktop. A browser tab will open asking you to authorize your Chatty account. Once approved, all 55 tools are live.
+
+---
+
+## 🏄 4. Windsurf / Cascade Integration
+
+In `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "chatty": {
+      "serverUrl": "https://api.chatty.personaliai.com/mcp"
+    }
+  }
+}
+```
+
+Cascade can now inspect live chatbot configurations, test RAG semantic search, and audit conversion rates during editor sessions.
+
+<PageNav {...prevNext("/guides/ai-coding-plugins")} />

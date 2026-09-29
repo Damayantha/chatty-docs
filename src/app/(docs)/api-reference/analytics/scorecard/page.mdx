@@ -1,0 +1,84 @@
+export const metadata = { 
+  title: "Get Bot Scorecard", 
+  description: "Calculate an industrial 5-pillar performance audit and A-F letter grade for a chatbot." 
+}
+
+import { ApiEndpointBadge } from "@/components/mdx/ApiEndpointBadge"
+import { ParamField, ResponseField } from "@/components/mdx/ParamField"
+import { PageNav } from "@/components/PageNav"
+import { prevNext } from "@/lib/navigation"
+
+# Get Bot Scorecard
+
+<ApiEndpointBadge method="GET" path="/api/admin/analytics/scorecard" />
+
+Calculates an operational 5-pillar performance audit and assigns an **A+ to F** letter grade based on real production telemetry.
+
+**Required scope:** `read` (or dashboard user with bot permissions)
+
+---
+
+## Query Parameters
+
+<ParamField query="bot_id" type="string" required>
+  UUID of the chatbot instance to audit.
+</ParamField>
+
+<ParamField query="days" type="integer">
+  Audit evaluation window in days. Default is `30` (allowed: 1 to 365).
+</ParamField>
+
+---
+
+## Response Fields
+
+<ResponseField name="bot_id" type="string">The audited bot instance UUID.</ResponseField>
+<ResponseField name="overall_grade" type="string">Letter grade: A+, A, A-, B+, B, B-, C+, C, D, or F.</ResponseField>
+<ResponseField name="composite_score" type="number">Weighted composite score from 0.0 to 100.0.</ResponseField>
+<ResponseField name="status" type="string">Human-readable operational status (e.g. Exceptional, High Performing).</ResponseField>
+<ResponseField name="pillars" type="object">
+  Breakdown across the 5 pillars:
+  - `conversion` (weight: 25%)
+  - `engagement` (weight: 20%)
+  - `accuracy` (weight: 25%)
+  - `reliability` (weight: 15%)
+  - `satisfaction` (weight: 15%)
+</ResponseField>
+<ResponseField name="recommendations" type="array">
+  Prioritized operational suggestions to optimize conversion and deflection.
+</ResponseField>
+
+---
+
+## Example Request
+
+```bash
+curl "https://api.chatty.personaliai.com/api/admin/analytics/scorecard?bot_id=8f9024b1-e25c-4122-8d77-a82a6fce921b&days=30" \
+  -H "Authorization: Bearer <YOUR_ACCESS_TOKEN>"
+```
+
+### 200 OK Response
+
+```json
+{
+  "bot_id": "8f9024b1-e25c-4122-8d77-a82a6fce921b",
+  "period_days": 30,
+  "overall_grade": "A-",
+  "composite_score": 88.5,
+  "status": "High Performing",
+  "audit_timestamp": "2026-09-29T14:38:39Z",
+  "pillars": {
+    "conversion": { "score": 86.4, "weight": "25%" },
+    "engagement": { "score": 91.2, "weight": "20%" },
+    "accuracy": { "score": 93.0, "weight": "25%" },
+    "reliability": { "score": 85.0, "weight": "15%" },
+    "satisfaction": { "score": 86.8, "weight": "15%" }
+  },
+  "recommendations": [
+    "Enable exit-intent campaign triggers to recover an estimated 8-12% more abandoning cart visitors.",
+    "Add FAQ chunks for international shipping to resolve remaining support escalations."
+  ]
+}
+```
+
+<PageNav {...prevNext("/api-reference/analytics/scorecard")} />
