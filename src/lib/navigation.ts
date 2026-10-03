@@ -62,6 +62,7 @@ export const navigation: NavGroup[] = [
       { title: "Bot Starter Templates",href: "/guides/templates" },
       { title: "Real-Time Voice Agent",href: "/guides/voice-agent" },
       { title: "Visual Flow Architect",href: "/guides/flow-architect" },
+      { title: "Flow Integrations",   href: "/guides/flow-integrations" },
       { title: "Proactive Campaigns",  href: "/guides/campaigns" },
       { title: "Calendar & Scheduling",href: "/guides/calendar-scheduling" },
       { title: "Live Inbox & Takeover",href: "/guides/human-takeover" },
