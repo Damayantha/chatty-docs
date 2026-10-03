@@ -39,7 +39,7 @@ function SearchModal({ onClose }: { onClose: () => void }) {
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 px-4" onClick={onClose}>
+    <div className="docs-search-modal fixed inset-0 z-50 flex items-start justify-center pt-20 px-4" onClick={onClose}>
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
       <div className="relative w-full max-w-xl bg-[--bg] rounded-xl border border-[--border] shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center gap-3 px-4 py-3 border-b border-[--border]">

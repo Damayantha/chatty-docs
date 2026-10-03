@@ -42,11 +42,23 @@
   ::selection { background: #f9731640; }
 }
 
-/* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* Quiet, neutral scrollbars that don't compete with the orange brand accent. */
+* { scrollbar-color: #cbd5e1 transparent; scrollbar-width: thin; }
+.dark * { scrollbar-color: #475569 transparent; }
+::-webkit-scrollbar { width: 7px; height: 7px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-subtle); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border: 2px solid transparent; background-clip: padding-box; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; border-width: 1px; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; border-color: transparent; background-clip: padding-box; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+@keyframes docs-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes docs-panel-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+.docs-search-modal { animation: docs-fade-in 160ms ease-out both; }
+.docs-mobile-menu { animation: docs-panel-in 180ms cubic-bezier(.22,1,.36,1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .docs-search-modal, .docs-mobile-menu { animation: none; }
+}
 
 /* Code blocks from rehype-pretty-code */
 [data-rehype-pretty-code-figure] {

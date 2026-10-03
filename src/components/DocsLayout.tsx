@@ -15,7 +15,7 @@ export function DocsLayout({ children }: { children: React.ReactNode }) {
       {menuOpen && (
         <div className="fixed inset-0 z-30 lg:hidden" onClick={() => setMenuOpen(false)}>
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-          <div className="absolute left-0 top-[--topbar-h] bottom-0 w-72 bg-[--bg] border-r border-[--border] overflow-y-auto">
+          <div className="docs-mobile-menu absolute left-0 top-[--topbar-h] bottom-0 w-72 bg-[--bg] border-r border-[--border] overflow-y-auto">
             <Sidebar mobile onClose={() => setMenuOpen(false)} />
           </div>
         </div>

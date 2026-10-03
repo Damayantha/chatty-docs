@@ -14,12 +14,17 @@ export function Accordion({ title, children }: { title: string; children: React.
         {title}
         <ChevronDown size={15} className={clsx("text-[--text-muted] transition-transform duration-200 shrink-0", open && "rotate-180")} />
       </button>
-      {open && (
-        <div className="px-4 pb-4 pt-1 text-sm text-[--text-muted] border-t border-[--border] bg-[--bg-subtle]
-          [&>p]:mt-2 [&>p]:leading-relaxed [&>pre]:mt-3">
-          {children}
+      <div className={clsx(
+        "grid transition-[grid-template-rows,opacity] duration-200 ease-out",
+        open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+      )}>
+        <div className="min-h-0 overflow-hidden">
+          <div className="px-4 pb-4 pt-1 text-sm text-[--text-muted] border-t border-[--border] bg-[--bg-subtle]
+            [&>p]:mt-2 [&>p]:leading-relaxed [&>pre]:mt-3">
+            {children}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
