@@ -1,160 +1,258 @@
-export const metadata = { title: "Webhooks", description: "Receive real-time events from Chatty to your server." }
+export const metadata = {
+  title: "Webhooks",
+  description: "Receive real-time signed event notifications from Chatty to your servers and external automation platforms."
+}
 
-import { Note, Tip, Warning } from "@/components/mdx/Callout"
+import { Note, Tip, Warning, Info } from "@/components/mdx/Callout"
+import { Card, CardGroup } from "@/components/mdx/Card"
+import { CodeGroup } from "@/components/mdx/CodeGroup"
 import { PageNav } from "@/components/PageNav"
 import { prevNext } from "@/lib/navigation"
 
 # Webhooks
 
-Chatty can POST a JSON payload to your server whenever a key event occurs — no polling required.
+Chatty webhooks deliver real-time, cryptographically signed JSON payloads to your servers whenever key events happen across your bots — eliminating the need for periodic API polling.
 
-For the complete setup guides for n8n, Zapier, and Make, see [Flow Integrations](/guides/flow-integrations). This page contains the webhook contract and verification reference.
+Use webhooks to synchronize captured leads with your CRM, log conversation transcripts in external data warehouses, trigger downstream workflows in **n8n / Zapier / Make**, or notify your on-call team in Slack.
 
-## Registering a webhook
+---
 
-**Via dashboard:** go to **Developer API → Webhooks**, paste your endpoint URL, pick which events to subscribe to, and click **Add Webhook**. The signing secret is shown once — copy it immediately.
+## Event Catalog
 
-**Via API:**
+Chatty supports the following webhook event topics:
 
-```bash title="Register via API"
-curl -X POST \
-  "https://api.chatty.personaliai.com/api/v1/webhooks" \
-  -H "Authorization: Bearer chatty_sk_your_key" \
+| Event Topic | Description | Trigger Moment |
+|---|---|---|
+| `lead.created` | New lead captured | A visitor provides their contact details (name, email, phone) in chat. |
+| `message.user` | Visitor message received | A customer sends a new message on any channel (widget, WhatsApp, Instagram, etc.). |
+| `message.assistant` | Bot response generated | The AI bot generates and delivers a response. Includes model latency metrics. |
+| `booking.confirmed` | Calendar meeting booked | A visitor selects a time slot and schedules an appointment via Google / Outlook integration. |
+| `handoff.requested` | Human operator escalation | Visitor triggers handoff intent or AI confidence drops below configured threshold. |
+| `csat.submitted` | Customer feedback submitted | Visitor rates the conversation (1–5 stars) and optionally submits text feedback. |
+| `session.started` | Conversation initialized | A visitor opens the widget and exchanges the first message. |
+| `session.ended` | Conversation closed | Session times out after 30 minutes of inactivity or is resolved by an operator. |
+| `product.updated` | Catalog item modified | Price, inventory, or metadata changes occur on manual catalog products. |
+
+---
+
+## Registering Webhooks
+
+### Via Dashboard
+
+1. Navigate to **Dashboard → Developer API → Webhooks**.
+2. Click **Create Webhook Subscription**.
+3. Enter your HTTPS endpoint URL (e.g. `https://api.yourcompany.com/webhooks/chatty`).
+4. Select the event topics you wish to subscribe to.
+5. Click **Save Webhook**.
+6. Chatty generates an **HMAC Signing Secret** (e.g. `whsec_3fa85f64...`). Copy this secret immediately; it is displayed once for security.
+
+### Via Developer REST API
+
+<CodeGroup>
+```bash title="Register Webhook Subscription"
+curl -X POST "https://api.chatty.personaliai.com/api/v1/webhooks" \
+  -H "Authorization: Bearer chatty_sk_..." \
   -H "Content-Type: application/json" \
   -d '{
-    "url": "https://your-server.com/chatty-webhook",
-    "events": ["lead.created", "message.assistant"]
+    "url": "https://api.yourcompany.com/webhooks/chatty",
+    "events": [
+      "lead.created",
+      "booking.confirmed",
+      "handoff.requested"
+    ]
   }'
 ```
 
-The response includes a generated `secret` — save it immediately, it's shown once and never returned again (`GET /api/v1/webhooks` lists your webhooks' URLs and event filters, not their secrets).
+```bash title="List Active Webhooks"
+curl -X GET "https://api.chatty.personaliai.com/api/v1/webhooks" \
+  -H "Authorization: Bearer chatty_sk_..."
+```
 
-## Events
+```bash title="Delete Webhook"
+curl -X DELETE "https://api.chatty.personaliai.com/api/v1/webhooks/{webhook_id}" \
+  -H "Authorization: Bearer chatty_sk_..."
+```
+</CodeGroup>
 
-| Event | Trigger |
-|---|---|
-| `lead.created` | A new lead is captured by the bot. |
-| `message.user` | A visitor sends a message. |
-| `message.assistant` | The bot replies. |
-| `session.started` | First message in a new session. |
-| `session.ended` | Session inactive for 30 minutes. |
+---
 
-## Payload format
+## Payload Format
 
-Every webhook POST has the same envelope:
+Every webhook notification uses a standardized envelope:
 
-```json
+```json title="Standard Webhook Envelope"
 {
   "event": "lead.created",
-  "bot_id": "a1b2c3d4-...",
-  "session_id": "visitor-xyz-789",
-  "timestamp": "2026-07-07T12:34:56Z",
+  "bot_id": "8f12a34b-c901-4def-b123-456789abcdef",
+  "session_id": "sess_98234abcdef123",
+  "timestamp": "2026-10-23T12:00:00.000Z",
+  "delivery_id": "deliv_01HZY8B2...",
   "data": { ... }
 }
 ```
 
-### `lead.created` data
+### Event Data Examples
 
+#### `lead.created`
 ```json
 {
-  "id": "ld_001abc",
-  "name": "Sarah Chen",
-  "email": "sarah@example.com",
-  "phone": "+1-555-0123",
-  "extra": {}
-}
-```
-
-### `message.assistant` data
-
-```json
-{
-  "message_id": "msg-uuid-011",
-  "role": "assistant",
-  "content": "Yes! Our Enterprise plan includes unlimited bots, SSO, and dedicated support.",
-  "latency_ms": 820
-}
-```
-
-## Signature verification
-
-Every request includes an `X-Chatty-Signature` header — an HMAC-SHA256 of the raw request body signed with your webhook secret.
-
-```python title="Python — verify signature"
-import hmac, hashlib
-
-def verify(payload: bytes, signature: str, secret: str) -> bool:
-    expected = hmac.new(secret.encode(), payload, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, signature)
-```
-
-```typescript title="Node.js — verify signature"
-import crypto from "crypto"
-
-function verify(payload: Buffer, signature: string, secret: string): boolean {
-  const expected = crypto.createHmac("sha256", secret)
-    .update(payload).digest("hex")
-  return crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(signature))
-}
-```
-
-<Warning>Always verify the signature before processing the payload. Reject requests where verification fails with a `401` response.</Warning>
-
-## Retries
-
-Chatty retries failed deliveries (non-2xx or timeout) with exponential back-off: after 1s, 5s, 30s, 5min, 30min, 2h, 8h. After 7 attempts the event is dropped.
-
-<Tip>Return a `200` as fast as possible — offload processing to a queue. Webhooks time out after **10 seconds**.</Tip>
-
-## Product catalog webhooks
-
-Manual products and media items can be updated from an ERP, PIM, store, or
-spreadsheet automation. Open **Dashboard → Knowledge → Products & Media → Add
-Custom Product** (or **Add Video Clip**), set the item's **External ID**, and
-enable the catalog webhook. Chatty shows a separate signed delivery URL and
-one-time signing secret for each bot.
-
-### Product identity
-
-The `bot_id` in the catalog webhook URL scopes the lookup. Within that bot,
-Chatty matches the exact, case-sensitive `external_id` from your source system.
-Keep this value stable and unique for every manual catalog item. Use an ERP
-key, SKU namespace, or provider ID such as `ERP-10042` or
-`shopify:gid://shopify/Product/123`; do not use a title, URL, price, array
-position, or Chatty's internal UUID.
-
-| Field | Purpose |
-|---|---|
-| `bot_id` (URL) | Selects the bot's catalog. |
-| `external_id` | Stable source-system key used for create, update, and delete. |
-| `item_id` (response) | Chatty's internal UUID, returned for diagnostics only. |
-| `sku` | Search/display data; it is not the webhook lookup key. |
-
-Send the same `external_id` for every lifecycle event:
-
-```json
-{
-  "event": "product.updated",
-  "external_id": "ERP-10042",
-  "item": {
-    "price": 79.99,
-    "metadata": {"in_stock": true}
+  "lead_id": "ld_0912fa89",
+  "name": "Alex Morgan",
+  "email": "alex.morgan@example.com",
+  "phone": "+1-555-0199",
+  "source_channel": "widget",
+  "custom_fields": {
+    "company_size": "50-200",
+    "estimated_budget": "$15,000"
   }
 }
 ```
 
-`external_id` is required for updates and deletes and is limited to 256
-characters. If duplicate IDs exist in a bot, Chatty returns `409` rather than
-changing an arbitrary product. The [WhatsApp and commerce guide](/guides/whatsapp)
-also covers the signed payload and catalog event details.
+#### `booking.confirmed`
+```json
+{
+  "booking_id": "bk_77189bca",
+  "attendee_name": "Sarah Connor",
+  "attendee_email": "sarah@cyberdyne.com",
+  "start_time": "2026-10-24T14:30:00Z",
+  "end_time": "2026-10-24T15:00:00Z",
+  "time_zone": "America/New_York",
+  "meeting_url": "https://meet.google.com/abc-defg-hij"
+}
+```
 
-## Testing locally
+#### `handoff.requested`
+```json
+{
+  "conversation_id": "conv_4412abef",
+  "reason": "customer_requested_agent",
+  "sentiment": "frustrated",
+  "channel": "whatsapp",
+  "customer_phone": "+14155552671",
+  "last_user_message": "I need to speak with a human right now regarding my billing invoice."
+}
+```
 
-Use a tunnel like [ngrok](https://ngrok.com) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) to expose your local server:
+---
+
+## Cryptographic Signature Verification
+
+Every incoming HTTP POST request includes the `X-Chatty-Signature` header. This signature is an **HMAC-SHA256 hash** of the raw HTTP request body calculated using your webhook's secret key.
+
+Always verify the signature before processing payloads to prevent spoofing or replay attacks:
+
+<CodeGroup>
+```python title="Python (FastAPI / Flask)"
+import hmac
+import hashlib
+
+def verify_chatty_signature(raw_body: bytes, signature_header: str, secret: str) -> bool:
+    """Verify incoming X-Chatty-Signature header against raw body bytes."""
+    computed = hmac.new(secret.encode("utf-8"), raw_body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(computed, signature_header)
+```
+
+```typescript title="TypeScript / Node.js"
+import crypto from "crypto";
+
+export function verifyChattySignature(rawBody: Buffer, signatureHeader: string, secret: string): boolean {
+  const hmac = crypto.createHmac("sha256", secret);
+  hmac.update(rawBody);
+  const computed = hmac.digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(computed), Buffer.from(signatureHeader));
+}
+```
+
+```php title="PHP"
+function verify_chatty_signature(string $rawBody, string $signatureHeader, string $secret): bool {
+    $computed = hash_hmac("sha256", $rawBody, $secret);
+    return hash_equals($computed, $signatureHeader);
+}
+```
+
+```go title="Go"
+package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+)
+
+func VerifyChattySignature(rawBody []byte, signatureHeader string, secret string) bool {
+    mac := hmac.New(sha256.New, []byte(secret))
+    mac.Write(rawBody)
+    expected := hex.EncodeToString(mac.Sum(nil))
+    return hmac.Equal([]byte(expected), []byte(signatureHeader))
+}
+```
+</CodeGroup>
+
+<Warning title="Use Raw Request Body">
+Verify signatures against the **raw, unparsed HTTP request body**. Parsing the body as JSON before verification can alter whitespace or key order, causing signature validation to fail.
+</Warning>
+
+---
+
+## Retry Policy & Dead-Letter Queue (DLQ)
+
+If your endpoint returns an HTTP status outside the `2xx` range or fails to respond within **10 seconds**, Chatty triggers automated exponential backoff retries:
+
+| Attempt | Wait Duration Before Next Retry |
+|---|---|
+| Attempt 1 | Immediate |
+| Attempt 2 | 1 second |
+| Attempt 3 | 5 seconds |
+| Attempt 4 | 30 seconds |
+| Attempt 5 | 5 minutes |
+| Attempt 6 | 30 minutes |
+| Attempt 7 | 2 hours |
+| Attempt 8 | 8 hours (Final Attempt) |
+
+After 8 failed attempts, the delivery is marked as `failed` and preserved in your bot's **Dead-Letter Queue (DLQ)**. You can view failed deliveries, inspect response codes, and manually replay them from **Dashboard → Developer API → Webhook Logs**.
+
+<Tip title="Handle Webhooks Asynchronously">
+Respond with `200 OK` as soon as the signature is verified, and push the payload to an asynchronous queue (such as Redis BullMQ, RabbitMQ, SQS, or Celery) for background processing.
+</Tip>
+
+---
+
+## Product Catalog & E-Commerce Webhooks
+
+Manual products and WooCommerce store catalogs can also be kept updated via real-time webhooks. When products change in external PIMs or ERP systems, send signed updates to:
+
+```text
+POST https://api.chatty.personaliai.com/api/v1/catalog/events
+```
+
+```json title="Product Update Payload"
+{
+  "event": "product.updated",
+  "bot_id": "YOUR_BOT_ID",
+  "external_id": "ERP-SKU-992",
+  "item": {
+    "title": "Ultra-light Titanium Camping Stove",
+    "price": 49.99,
+    "inventory_count": 142,
+    "in_stock": true,
+    "url": "https://mystore.com/products/titanium-stove"
+  }
+}
+```
+
+For complete details on connecting WooCommerce stores with automated webhook synchronization, see the [WooCommerce Integration Guide](/guides/woocommerce).
+
+---
+
+## Local Development & Testing
+
+When developing webhooks locally, use tunnels like [ngrok](https://ngrok.com) or [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) to provide an HTTPS endpoint:
 
 ```bash
 ngrok http 3000
-# Chatty webhook URL: https://abc123.ngrok.io/chatty-webhook
+# Forwarding https://abc1234.ngrok-free.app -> http://localhost:3000
 ```
+
+Register `https://abc1234.ngrok-free.app/webhooks/chatty` in the Chatty dashboard to receive live events during local testing.
 
 <PageNav {...prevNext("/guides/webhooks")} />

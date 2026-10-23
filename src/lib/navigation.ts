@@ -45,6 +45,8 @@ export const navigation: NavGroup[] = [
   {
     title: "Channels & Integrations",
     items: [
+      { title: "Omnichannel Hub",      href: "/guides/omnichannel" },
+      { title: "WooCommerce Store",    href: "/guides/woocommerce" },
       { title: "Embed Widget",         href: "/guides/embed-widget" },
       { title: "React & Next.js",      href: "/guides/react-sdk" },
       { title: "WordPress Plugin",     href: "/guides/wordpress" },
@@ -61,7 +63,7 @@ export const navigation: NavGroup[] = [
       { title: "Performance Scorecard",href: "/guides/scorecard" },
       { title: "Bot Starter Templates",href: "/guides/templates" },
       { title: "Real-Time Voice Agent",href: "/guides/voice-agent" },
-      { title: "Visual Flow Architect",href: "/guides/flow-architect" },
+      { title: "Visual Flow Builder",  href: "/guides/flow-architect" },
       { title: "Flow Integrations",   href: "/guides/flow-integrations" },
       { title: "Proactive Campaigns",  href: "/guides/campaigns" },
       { title: "Calendar & Scheduling",href: "/guides/calendar-scheduling" },
