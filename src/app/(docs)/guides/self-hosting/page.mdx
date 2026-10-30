@@ -77,6 +77,27 @@ flowchart TB
     targets -. deploys .-> compute
 ```
 
+## ⚡ 1-Click Cloud Deployment
+
+Deploy the complete Chatty application (backend API + frontend dashboard) directly to cloud platforms:
+
+<div className="flex flex-wrap items-center gap-4 my-6">
+  <a href="https://render.com/deploy?repo=https://github.com/PersonaliAI/chatty" target="_blank" rel="noopener noreferrer">
+    <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Render" />
+  </a>
+  <a href="https://railway.com/new/template?template=https://github.com/PersonaliAI/chatty" target="_blank" rel="noopener noreferrer">
+    <img src="https://railway.com/button.svg" alt="Deploy on Railway" />
+  </a>
+</div>
+
+<Tip>
+**What to prepare before or right after clicking Deploy:**
+1. **Create Free Supabase Project:** Go to [supabase.com](https://supabase.com), create a free project, and copy your **Project URL**, **anon key**, **service_role key**, and **Database Connection URI** from Project Settings.
+2. **Run Migrations Once:** Run `python scripts/apply_migrations.py "<connection_string>"` from `backend/` (or run SQL files in `backend/supabase/migrations/` in Supabase SQL editor) to provision all 67+ tables and vector schemas.
+3. **Get Free Gemini API Key:** Create a key at [aistudio.google.com/apikey](https://aistudio.google.com/apikey).
+4. **Enter Variables:** When Render or Railway prompts for environment variables, fill in your Supabase credentials, database host/password, and Gemini key.
+</Tip>
+
 ## 1. Prerequisites and security boundary
 
 - A Supabase project and database password.
